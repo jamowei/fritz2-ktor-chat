@@ -14,6 +14,7 @@ This project uses the following libraries:
 * [fritz2](https://github.com/jwstegemann/fritz2) - mainly in the frontend, except validation and model in both sides
 * [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization) - used in frontend and backend for serializing the shared model
 * [Ktor](https://ktor.io/) - running the server with
+* [Ktor Websockets](https://ktor.io/docs/servers-features-websockets.html) - providing Websocket-based API
 * [Exposed](https://github.com/JetBrains/Exposed) - making CRUD operations to the database
 * [H2 Database](https://www.h2database.com/html/main.html) - running as in-memory-db which stores the data
 
