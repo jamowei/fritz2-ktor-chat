@@ -11,6 +11,7 @@ group = "dev.fritz2"
 version = "1.0"
 
 repositories {
+    mavenLocal()
     jcenter()
     mavenCentral()
     maven { url = uri("https://dl.bintray.com/kotlin/kotlin-js-wrappers") }
@@ -43,11 +44,10 @@ kotlin {
         val logbackVersion = "1.2.3"
         val serializationVersion = "1.0.1"
         val dateTimeVersion = "0.1.1"
-        val exposedVersion = "0.28.1"
-        val h2Version = "1.4.200"
 
         val commonMain by getting {
             dependencies {
+                implementation("dev.fritz2:core:0.9-SNAPSHOT")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:$dateTimeVersion")
             }
@@ -64,11 +64,6 @@ kotlin {
                 implementation("io.ktor:ktor-serialization:$ktorVersion")
                 implementation("io.ktor:ktor-websockets:$ktorVersion")
                 implementation("ch.qos.logback:logback-classic:$logbackVersion")
-
-                implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
-                implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
-                implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
-                implementation("com.h2database:h2:$h2Version")
             }
         }
         val jvmTest by getting {
@@ -78,7 +73,7 @@ kotlin {
         }
         val jsMain by getting {
             dependencies {
-                implementation("dev.fritz2:components:0.8")
+                implementation("dev.fritz2:components:0.9-SNAPSHOT")
             }
         }
         val jsTest by getting {
