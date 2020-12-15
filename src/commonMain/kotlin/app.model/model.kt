@@ -19,7 +19,7 @@ import kotlinx.serialization.json.Json
 @Serializable
 data class ChatMessage(
     val content: String,
-    val member: ChatMember = ChatMember.default,
+    val member: String,
     val type: MessageType = MessageType.MESSAGE,
     @Serializable(with = InstantSerializer::class)
     val created: Instant = Clock.System.now()
@@ -37,26 +37,8 @@ data class ChatMessage(
         val resource = Resource(
             { "${it.member}_${it.created.epochSeconds}" },
             resourceSerializer,
-            ChatMessage("")
+            ChatMessage("", "")
         )
-    }
-}
-
-@Lenses
-@Serializable
-data class ChatMember(val name: String) {
-    companion object {
-        val default = ChatMember("Default")
-        val resourceSerializer = object : ResourceSerializer<ChatMember> {
-            override fun read(source: String): ChatMember = Json.decodeFromString(serializer(), source)
-            override fun readList(source: String): List<ChatMember> =
-                Json.decodeFromString(ListSerializer(serializer()), source)
-
-            override fun write(item: ChatMember): String = Json.encodeToString(serializer(), item)
-            override fun writeList(items: List<ChatMember>): String =
-                Json.encodeToString(ListSerializer(serializer()), items)
-        }
-        val resource = Resource(ChatMember::name, resourceSerializer, default)
     }
 }
 

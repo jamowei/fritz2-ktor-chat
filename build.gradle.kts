@@ -69,6 +69,7 @@ kotlin {
         val jvmTest by getting {
             dependencies {
                 implementation(kotlin("test-junit"))
+                implementation("io.ktor:ktor-server-test-host:$ktorVersion")
             }
         }
         val jsMain by getting {
