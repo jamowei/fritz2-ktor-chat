@@ -31,8 +31,11 @@ fun Application.main() {
 
     routing {
         get("/") {
-            call.respondRedirect("/index.html", permanent = true)
+            call.resolveResource("index.html")?.let {
+                call.respond(it)
+            }
         }
+
         static("/") {
             resources("/")
         }
