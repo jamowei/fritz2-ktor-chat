@@ -1,8 +1,8 @@
 package app.model
 
+import dev.fritz2.lenses.IdProvider
 import dev.fritz2.lenses.Lenses
 import dev.fritz2.resource.Resource
-import dev.fritz2.resource.ResourceSerializer
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.KSerializer
@@ -23,22 +23,22 @@ data class ChatMessage(
     val type: MessageType = MessageType.MESSAGE,
     @Serializable(with = InstantSerializer::class)
     val created: Instant = Clock.System.now()
-) {
-    companion object {
-        val resourceSerializer = object : ResourceSerializer<ChatMessage> {
-            override fun read(source: String): ChatMessage = Json.decodeFromString(serializer(), source)
-            override fun readList(source: String): List<ChatMessage> =
-                Json.decodeFromString(ListSerializer(serializer()), source)
+)
 
-            override fun write(item: ChatMessage): String = Json.encodeToString(serializer(), item)
-            override fun writeList(items: List<ChatMessage>): String =
-                Json.encodeToString(ListSerializer(serializer()), items)
-        }
-        val resource = Resource(
-            { "${it.member}_${it.created.epochSeconds}" },
-            resourceSerializer
-        )
-    }
+object ChatResource : Resource<ChatMessage, String> {
+    override val idProvider: IdProvider<ChatMessage, String> = { "${it.member}_${it.created.epochSeconds}" }
+
+    override fun deserialize(source: String): ChatMessage =
+        Json.decodeFromString(ChatMessage.serializer(), source)
+
+    override fun serialize(item: ChatMessage): String =
+        Json.encodeToString(ChatMessage.serializer(), item)
+
+    override fun deserializeList(source: String): List<ChatMessage> =
+        Json.decodeFromString(ListSerializer(ChatMessage.serializer()), source)
+
+    override fun serializeList(items: List<ChatMessage>): String =
+        Json.encodeToString(ListSerializer(ChatMessage.serializer()), items)
 }
 
 enum class MessageType {
