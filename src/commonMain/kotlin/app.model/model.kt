@@ -25,7 +25,7 @@ data class ChatMessage(
     val created: Instant = Clock.System.now()
 )
 
-object ChatResource : Resource<ChatMessage, String> {
+object ChatMessageResource : Resource<ChatMessage, String> {
     override val idProvider: IdProvider<ChatMessage, String> = { "${it.member}_${it.created.epochSeconds}" }
 
     override fun deserialize(source: String): ChatMessage =

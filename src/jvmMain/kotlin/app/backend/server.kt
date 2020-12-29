@@ -1,17 +1,19 @@
 package app.backend
 
 import app.model.ChatMessage
+import app.model.ChatMessageResource
 import app.model.MessageType
 import io.ktor.application.*
-import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.http.cio.websocket.*
 import io.ktor.http.content.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import io.ktor.serialization.*
 import io.ktor.server.netty.*
 import io.ktor.websocket.*
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.json.Json
 import java.io.File
 import java.util.*
 
@@ -22,10 +24,6 @@ private val chatroom = Collections.synchronizedMap(HashMap<String, MutableList<C
 fun Application.main() {
     val currentDir = File(".").absoluteFile
     environment.log.info("Current directory: $currentDir")
-
-    install(ContentNegotiation) {
-        json()
-    }
 
     install(WebSockets)
 
@@ -50,7 +48,7 @@ fun Application.main() {
                         is Frame.Text -> {
                             // parse new message
                             val text = frame.readText()
-                            val msg = ChatMessage.resourceSerializer.read(text)
+                            val msg = ChatMessageResource.deserialize(text)
 
                             // get all clients in chatroom
                             val clients = chatroom[id] ?: mutableListOf()
@@ -61,7 +59,7 @@ fun Application.main() {
                                 // inform other members that a new user is joined
                                 clients.forEach {
                                     it.session.outgoing.send(Frame.Text(
-                                        ChatMessage.resourceSerializer.write(joinMessage(msg.member))
+                                        ChatMessageResource.serialize(joinMessage(msg.member))
                                     ))
                                 }
                                 clients.add(ChatClient(msg.member, session))
@@ -87,7 +85,7 @@ fun Application.main() {
                         clients.remove(client)
                         clients.forEach {
                             it.session.outgoing.send(Frame.Text(
-                                ChatMessage.resourceSerializer.write(leaveMessage(client.member))
+                                ChatMessageResource.serialize(leaveMessage(client.member))
                             ))
                         }
                         chatroom[id] = clients
@@ -102,7 +100,7 @@ fun Application.main() {
             else {
                 val clients = chatroom[id]
                 if(clients == null) call.respond(HttpStatusCode.BadRequest, "error: chatroom not found!")
-                else call.respond(clients.map { it.member })
+                else call.respond(Json.encodeToString(ListSerializer(String.serializer()), clients.map { it.member }))
             }
         }
     }

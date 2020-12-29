@@ -1,6 +1,7 @@
 package app.backend
 
 import app.model.ChatMessage
+import app.model.ChatMessageResource
 import app.model.MessageType
 import io.ktor.application.*
 import io.ktor.http.*
@@ -49,7 +50,7 @@ class ServerTest {
                         for (frame in incomingA) {
                             when (frame) {
                                 is Frame.Text -> {
-                                    val message = ChatMessage.resourceSerializer.read(frame.readText())
+                                    val message = ChatMessageResource.deserialize(frame.readText())
                                     environment.log.info("Session A: ${message.content}")
                                     when (count++) {
                                         0 -> {
@@ -73,7 +74,7 @@ class ServerTest {
                         for (frame in incomingB) {
                             when (frame) {
                                 is Frame.Text -> {
-                                    val message = ChatMessage.resourceSerializer.read(frame.readText())
+                                    val message = ChatMessageResource.deserialize(frame.readText())
                                     environment.log.info("Session B: ${message.content}")
                                     assertEquals(msgA, message.content)
                                 }
@@ -84,11 +85,11 @@ class ServerTest {
 
                     launch {
                         delay(500)
-                        outgoingA.send(Frame.Text(ChatMessage.resourceSerializer.write(ChatMessage(msgA, memberA))))
+                        outgoingA.send(Frame.Text(ChatMessageResource.serialize(ChatMessage(msgA, memberA))))
                         delay(200)
-                        outgoingB.send(Frame.Text(ChatMessage.resourceSerializer.write(ChatMessage(msgB, memberB))))
+                        outgoingB.send(Frame.Text(ChatMessageResource.serialize(ChatMessage(msgB, memberB))))
                         delay(200)
-                        outgoingA.send(Frame.Text(ChatMessage.resourceSerializer.write(ChatMessage(msgA, memberA))))
+                        outgoingA.send(Frame.Text(ChatMessageResource.serialize(ChatMessage(msgA, memberA))))
                         delay(500)
                     }
                     delay(1000)
