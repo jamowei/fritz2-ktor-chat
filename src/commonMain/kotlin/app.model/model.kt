@@ -36,8 +36,7 @@ data class ChatMessage(
         }
         val resource = Resource(
             { "${it.member}_${it.created.epochSeconds}" },
-            resourceSerializer,
-            ChatMessage("", "")
+            resourceSerializer
         )
     }
 }

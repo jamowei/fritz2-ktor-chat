@@ -48,6 +48,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation("dev.fritz2:core:0.9-SNAPSHOT")
+//                implementation("dev.fritz2:core:0.8")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:$dateTimeVersion")
             }
@@ -74,7 +75,7 @@ kotlin {
         }
         val jsMain by getting {
             dependencies {
-                implementation("dev.fritz2:components:0.9-SNAPSHOT")
+//                implementation("dev.fritz2:components:0.9-SNAPSHOT")
             }
         }
         val jsTest by getting {
