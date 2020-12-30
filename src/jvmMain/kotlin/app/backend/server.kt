@@ -1,7 +1,6 @@
 package app.backend
 
 import app.model.ChatMessage
-import app.model.ChatMessageResource
 import app.model.MessageType
 import io.ktor.application.*
 import io.ktor.http.*
@@ -38,9 +37,9 @@ fun Application.main() {
             resources("/")
         }
 
-        webSocket("/chat/{id}") {
-            val id = call.parameters["id"]
-            if (id == null) call.respond(HttpStatusCode.BadRequest, "error: must provide id!")
+        webSocket("/chat/{room}") {
+            val room = call.parameters["room"]
+            if (room == null) call.respond(HttpStatusCode.BadRequest, "error: must provide id!")
             val session = this
             try {
                 for (frame in incoming) {
@@ -48,57 +47,59 @@ fun Application.main() {
                         is Frame.Text -> {
                             // parse new message
                             val text = frame.readText()
-                            val msg = ChatMessageResource.deserialize(text)
+                            val msg = ChatMessage.fromJson(text)
 
                             // get all clients in chatroom
-                            val clients = chatroom[id] ?: mutableListOf()
+                            val clients = chatroom[room] ?: mutableListOf()
 
                             // add new member to chatroom
-                            if (clients.none { it.member == msg.member }) {
-                                environment.log.debug("Add new member ${msg.member} to chatroom $id")
-                                // inform other members that a new user is joined
-                                clients.forEach {
-                                    it.session.outgoing.send(Frame.Text(
-                                        ChatMessageResource.serialize(joinMessage(msg.member))
-                                    ))
+                            when(msg.type) {
+                                MessageType.JOINING -> {
+                                    environment.log.debug("Add new member ${msg.member} to chatroom $room")
+                                    // inform other members that a new user is joined
+                                    clients.forEach {
+                                        it.session.outgoing.send(
+                                            Frame.Text(joinMessage(msg.member).toJson())
+                                        )
+                                    }
+                                    clients.add(ChatClient(msg.member, session))
                                 }
-                                clients.add(ChatClient(msg.member, session))
-                            }
-
-                            // broadcast message to other members
-                            clients.filter { it.member != msg.member }.forEach {
-                                environment.log.debug("Sending message from ${msg.member} to members ${it.member} in chatroom $id")
-                                it.session.outgoing.send(Frame.Text(text))
+                                MessageType.MESSAGE -> {
+                                    // broadcast message to other members
+                                    clients.filter { it.member != msg.member }.forEach {
+                                        environment.log.debug("Sending message from ${msg.member} to members ${it.member} in chatroom $room")
+                                        it.session.outgoing.send(Frame.Text(text))
+                                    }
+                                }
+                                else -> call.respond(HttpStatusCode.BadRequest, "error: wrong message type!")
                             }
 
                             // save new client list
-                            chatroom[id] = clients
+                            chatroom[room] = clients
                         }
                         else -> call.respond(HttpStatusCode.BadRequest, "error: must provide json!")
                     }
                 }
             } finally {
                 // remove client from chatroom when session is closed
-                chatroom[id]?.let { clients ->
+                chatroom[room]?.let { clients ->
                     clients.find { it.session == session }?.let { client ->
-                        environment.log.debug("Remove member ${client.member} from chatroom $id")
+                        environment.log.debug("Remove member ${client.member} from chatroom $room")
                         clients.remove(client)
                         clients.forEach {
-                            it.session.outgoing.send(Frame.Text(
-                                ChatMessageResource.serialize(leaveMessage(client.member))
-                            ))
+                            it.session.outgoing.send(Frame.Text(leaveMessage(client.member).toJson()))
                         }
-                        chatroom[id] = clients
+                        chatroom[room] = clients
                     }
                 }
             }
         }
 
-        get("/members/{id}") {
-            val id = call.parameters["id"]
-            if (id == null) call.respond(HttpStatusCode.BadRequest, "error: must provide id!")
+        get("/members/{room}") {
+            val room = call.parameters["room"]
+            if (room == null) call.respond(HttpStatusCode.BadRequest, "error: must provide id!")
             else {
-                val clients = chatroom[id]
+                val clients = chatroom[room]
                 if(clients == null) call.respond(HttpStatusCode.BadRequest, "error: chatroom not found!")
                 else call.respond(Json.encodeToString(ListSerializer(String.serializer()), clients.map { it.member }))
             }
