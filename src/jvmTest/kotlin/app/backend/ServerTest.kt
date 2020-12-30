@@ -85,18 +85,21 @@ class ServerTest {
                     launch {
                         delay(500)
                         outgoingA.send(Frame.Text(ChatMessage("", memberA, MessageType.JOINING).toJson()))
+                        delay(200)
+                        outgoingB.send(Frame.Text(ChatMessage("", memberB, MessageType.JOINING).toJson()))
+
+                        delay(200)
                         outgoingA.send(Frame.Text(ChatMessage(msgA, memberA).toJson()))
                         delay(200)
-                        outgoingA.send(Frame.Text(ChatMessage("", memberB, MessageType.JOINING).toJson()))
                         outgoingB.send(Frame.Text(ChatMessage(msgB, memberB).toJson()))
                         delay(200)
                         outgoingA.send(Frame.Text(ChatMessage(msgA, memberA).toJson()))
                         delay(500)
                     }
-                    delay(1000)
+                    delay(2000)
                     checkMembers(listOf(memberA, memberB))
                 }
-                delay(1000)
+                delay(200)
                 checkMembers(listOf(memberA))
             }
             checkMembers(emptyList())
