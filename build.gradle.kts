@@ -37,6 +37,15 @@ kotlin {
                     useChromeHeadless()
                 }
             }
+            runTask {
+                devServer = org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig.DevServer(
+                    port = 9000,
+                    contentBase = listOf("$buildDir/distributions"),
+                    proxy = mapOf(
+                        "/members" to "http://localhost:8080"
+                    )
+                )
+            }
         }
     }
     sourceSets {
