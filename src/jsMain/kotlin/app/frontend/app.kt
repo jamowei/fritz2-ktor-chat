@@ -16,8 +16,8 @@ fun main() {
         div("container clearfix") {
             router.data.render { params ->
                 if(params[roomParam].isNullOrBlank() || params[nameParam].isNullOrBlank())
-                    chatPage(params[roomParam]!!, params[nameParam]!!)
-                else startPage()
+                    startPage()
+                else chatPage(params[roomParam]!!, params[nameParam]!!)
             }
         }
     }.mount("target")
