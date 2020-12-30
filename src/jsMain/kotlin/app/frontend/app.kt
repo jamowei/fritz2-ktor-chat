@@ -1,9 +1,12 @@
 package app.frontend
 
+import dev.fritz2.dom.html.render
 import dev.fritz2.dom.html.renderElement
 import dev.fritz2.dom.mount
 import dev.fritz2.routing.router
 import dev.fritz2.styling.params.styled
+import dev.fritz2.styling.theme.DefaultTheme
+import dev.fritz2.styling.theme.render
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 val defaultRoute = mapOf<String, String>()
@@ -11,14 +14,17 @@ val router = router(defaultRoute)
 
 @ExperimentalCoroutinesApi
 fun main() {
-    renderElement {
+    render(DefaultTheme()) {
         (::div.styled {
-            css("""
-                margin: 0 auto;
-                width: 750px;
-                background: #444753;
-                border-radius: 5px;
-            """.trimIndent())
+            boxShadow { raised }
+            margins {
+                vertical { normal }
+                horizontal { auto }
+            }
+            width { "750px" }
+            height { "760px" }
+            background { color { "#444753" } }
+            radius { normal }
         }) {
             router.data.render { params ->
                 if(params["room"].isNullOrBlank() || params["member"].isNullOrBlank())

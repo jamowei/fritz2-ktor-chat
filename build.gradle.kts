@@ -87,7 +87,7 @@ kotlin {
         }
         val jsMain by getting {
             dependencies {
-                implementation("dev.fritz2:styling:0.9-SNAPSHOT")
+                implementation("dev.fritz2:components:0.9-SNAPSHOT")
             }
         }
         val jsTest by getting {
