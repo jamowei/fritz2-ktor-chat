@@ -55,7 +55,7 @@ fun Application.main() {
                             // add new member to chatroom
                             when(msg.type) {
                                 MessageType.JOINING -> {
-                                    environment.log.debug("Add new member ${msg.member} to chatroom $room")
+                                    environment.log.info("Add new member ${msg.member} to chatroom $room")
                                     // inform other members that a new user is joined
                                     clients.forEach {
                                         it.session.outgoing.send(
@@ -67,7 +67,7 @@ fun Application.main() {
                                 MessageType.MESSAGE -> {
                                     // broadcast message to other members
                                     clients.filter { it.member != msg.member }.forEach {
-                                        environment.log.debug("Sending message from ${msg.member} to members ${it.member} in chatroom $room")
+                                        environment.log.info("Sending message from ${msg.member} to members ${it.member} in chatroom $room")
                                         it.session.outgoing.send(Frame.Text(text))
                                     }
                                 }
@@ -84,7 +84,7 @@ fun Application.main() {
                 // remove client from chatroom when session is closed
                 chatroom[room]?.let { clients ->
                     clients.find { it.session == session }?.let { client ->
-                        environment.log.debug("Remove member ${client.member} from chatroom $room")
+                        environment.log.info("Remove member ${client.member} from chatroom $room")
                         clients.remove(client)
                         clients.forEach {
                             it.session.outgoing.send(Frame.Text(leaveMessage(client.member).toJson()))
