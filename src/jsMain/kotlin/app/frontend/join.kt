@@ -2,7 +2,7 @@ package app.frontend
 
 import dev.fritz2.dom.html.RenderContext
 
-fun RenderContext.startPage() {
+fun RenderContext.joinPage() {
 
     div("chat") {
         div("chat-header clearfix") {

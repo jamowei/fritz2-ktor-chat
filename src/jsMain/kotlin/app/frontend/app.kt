@@ -1,7 +1,5 @@
 package app.frontend
 
-import dev.fritz2.dom.html.render
-import dev.fritz2.dom.html.renderElement
 import dev.fritz2.dom.mount
 import dev.fritz2.routing.router
 import dev.fritz2.styling.params.styled
@@ -28,7 +26,7 @@ fun main() {
         }) {
             router.data.render { params ->
                 if(params["room"].isNullOrBlank() || params["member"].isNullOrBlank())
-                    startPage()
+                    joinPage()
                 else chatPage(params["room"]!!, params["member"]!!)
             }
         }
