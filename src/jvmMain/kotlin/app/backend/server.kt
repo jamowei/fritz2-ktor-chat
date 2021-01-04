@@ -1,7 +1,7 @@
 package app.backend
 
-import app.model.ChatMessage
-import app.model.MessageType
+import app.shared.ChatMessage
+import app.shared.MessageType
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.http.cio.websocket.*
@@ -89,7 +89,8 @@ fun Application.main() {
                         clients.forEach {
                             it.session.outgoing.send(Frame.Text(leaveMessage(client.member).toJson()))
                         }
-                        chatroom[room] = clients
+                        if(clients.isEmpty()) chatroom.remove(room)
+                        else chatroom[room] = clients
                     }
                 }
             }
@@ -103,6 +104,10 @@ fun Application.main() {
                 if(clients == null) call.respond(HttpStatusCode.BadRequest, "error: chatroom not found!")
                 else call.respond(Json.encodeToString(ListSerializer(String.serializer()), clients.map { it.member }))
             }
+        }
+
+        get("/rooms") {
+            call.respond(chatroom.size.toString())
         }
     }
 }
