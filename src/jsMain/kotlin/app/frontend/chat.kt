@@ -1,8 +1,13 @@
 package app.frontend
 
-import app.model.ChatMessage
-import app.model.MessageType
+import app.shared.ChatMessage
+import app.shared.MessageType
 import dev.fritz2.binding.RootStore
+import dev.fritz2.binding.invoke
+import dev.fritz2.components.icon
+import dev.fritz2.components.inputField
+import dev.fritz2.components.lineUp
+import dev.fritz2.components.stackUp
 import dev.fritz2.dom.html.Keys
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.key
@@ -10,111 +15,38 @@ import dev.fritz2.remote.body
 import dev.fritz2.remote.getBody
 import dev.fritz2.remote.http
 import dev.fritz2.remote.websocket
+import dev.fritz2.styling.params.styled
+import kotlinx.browser.document
+import kotlinx.browser.window
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
-import dev.fritz2.binding.invoke
-import dev.fritz2.components.icon
-import dev.fritz2.components.inputField
-import dev.fritz2.components.lineUp
-import dev.fritz2.components.stackUp
-import dev.fritz2.styling.params.shadow
-import dev.fritz2.styling.params.styled
 
-fun RenderContext.renderMsg(msg: ChatMessage, self: Boolean) {
-    val bgColor = if (self) "#94c2ed" else "#86bb71"
-
-    lineUp({
-        margins { bottom { normal } }
-        textAlign { if (self) right else left }
-        fontSize { small }
-    }) {
-        reverse { self }
-        spacing { smaller }
-        items {
-            if (!self) {
-                icon({
-                    size { normal }
-                    margins { top { "0.1rem" } }
-                }) { fromTheme { user } }
-            }
-            (::span.styled {
-                fontWeight { semiBold }
-            }) {
-                +msg.member
-            }
-            (::span.styled {
-                color { "#a8aab1" }
-            }) {
-                icon({
-                    size { small }
-                    margins { right { tiny } }
-                }) { fromTheme { clock } }
-                +msg.created.toString()
-            }
-        }
-    }
-    (::div.styled {
-        boxShadow { flat }
-        background { color { bgColor } }
-        color { "white" }
-        paddings {
-            vertical { smaller }
-            horizontal { small }
-        }
-        lineHeight { huge }
-        fontSize { normal }
-        margins { bottom { larger } }
-        width { "90%" }
-        position { relative { } }
-        margins {
-            if (self) left { "10%" } else right { "10%"}
-        }
-        radius { normal }
-        after {
-            border {
-                style { solid }
-                width { "10px" }
-                color { "transparent" }
-            }
-            borders { bottom { color { bgColor } } }
-            position { absolute {
-                bottom { "100%" }
-                if (self) right { large } else left { large }
-            } }
-            height { none }
-            width { none }
-            css("""
-                content: " ";
-                pointer-events: none;                
-            """.trimIndent())
-        }
-    }) {
-        +msg.content
-    }
-}
-
+@ExperimentalCoroutinesApi
 fun RenderContext.chatPage(room: String, name: String) {
+
+    document.title = "Chat $name | $room"
 
     val membersStore = object : RootStore<List<String>>(emptyList()) {
         val remote = http("/members/$room")
 
         val load = handle {
+            delay(200)
             Json.decodeFromString(ListSerializer(String.serializer()), remote.get().getBody()) - name
         }
-
-        init { load() }
     }
 
     val messagesStore = object : RootStore<List<ChatMessage>>(emptyList()) {
         val session = websocket("ws://localhost:8080/chat/$room").connect()
 
         val receive = handle<ChatMessage> { msgs, msg ->
-            when (msg.type) {
-                MessageType.JOINING, MessageType.LEAVING -> membersStore.load()
-            }
+            if (msg.type == MessageType.JOINING ||
+                msg.type == MessageType.LEAVING)
+                    membersStore.load()
             msgs + msg
         }
 
@@ -134,6 +66,7 @@ fun RenderContext.chatPage(room: String, name: String) {
         init {
             join()
             session.messages.body.map { ChatMessage.fromJson(it) } handledBy receive
+            membersStore.load()
         }
     }
 
@@ -281,5 +214,79 @@ fun RenderContext.chatPage(room: String, name: String) {
                 }
             }
         }
+    }
+}
+
+@ExperimentalCoroutinesApi
+fun RenderContext.renderMsg(msg: ChatMessage, self: Boolean) {
+    val bgColor = if (self) "#94c2ed" else "#86bb71"
+
+    lineUp({
+        margins { bottom { normal } }
+        textAlign { if (self) right else left }
+        fontSize { small }
+    }) {
+        reverse { self }
+        spacing { smaller }
+        items {
+            if (!self) {
+                icon({
+                    size { normal }
+                    margins { top { "0.1rem" } }
+                }) { fromTheme { user } }
+            }
+            (::span.styled {
+                fontWeight { semiBold }
+            }) {
+                +msg.member
+            }
+            (::span.styled {
+                color { "#a8aab1" }
+            }) {
+                icon({
+                    size { small }
+                    margins { right { tiny } }
+                }) { fromTheme { clock } }
+                +msg.created.toString()
+            }
+        }
+    }
+    (::div.styled {
+        boxShadow { flat }
+        background { color { bgColor } }
+        color { "white" }
+        paddings {
+            vertical { smaller }
+            horizontal { small }
+        }
+        lineHeight { huge }
+        fontSize { normal }
+        margins { bottom { larger } }
+        width { "90%" }
+        position { relative { } }
+        margins {
+            if (self) left { "10%" } else right { "10%"}
+        }
+        radius { normal }
+        after {
+            border {
+                style { solid }
+                width { "10px" }
+                color { "transparent" }
+            }
+            borders { bottom { color { bgColor } } }
+            position { absolute {
+                bottom { "100%" }
+                if (self) right { large } else left { large }
+            } }
+            height { none }
+            width { none }
+            css("""
+                content: " ";
+                pointer-events: none;                
+            """.trimIndent())
+        }
+    }) {
+        +msg.content
     }
 }
