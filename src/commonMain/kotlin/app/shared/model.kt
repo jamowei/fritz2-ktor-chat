@@ -1,4 +1,4 @@
-package app.model
+package app.shared
 
 import dev.fritz2.lenses.Lenses
 import kotlinx.datetime.Clock
