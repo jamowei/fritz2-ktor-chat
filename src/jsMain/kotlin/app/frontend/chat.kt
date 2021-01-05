@@ -4,10 +4,7 @@ import app.shared.ChatMessage
 import app.shared.MessageType
 import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.invoke
-import dev.fritz2.components.icon
-import dev.fritz2.components.inputField
-import dev.fritz2.components.lineUp
-import dev.fritz2.components.stackUp
+import dev.fritz2.components.*
 import dev.fritz2.dom.html.Keys
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.key
@@ -38,15 +35,20 @@ fun RenderContext.chatPage(room: String, name: String) {
             delay(200)
             Json.decodeFromString(ListSerializer(String.serializer()), remote.get().getBody()) - name
         }
+
+        val invite = handle {
+            window.navigator.clipboard.writeText(
+                "${window.location.protocol}//${window.location.host}/#room=$room"
+            )
+            it
+        }
     }
 
     val messagesStore = object : RootStore<List<ChatMessage>>(emptyList()) {
-        val session = websocket("ws://localhost:8080/chat/$room").connect()
+        val session = websocket("ws://${window.location.host}/chat/$room").connect()
 
         val receive = handle<ChatMessage> { msgs, msg ->
-            if (msg.type == MessageType.JOINING ||
-                msg.type == MessageType.LEAVING)
-                    membersStore.load()
+            if (msg.type == MessageType.JOINING || msg.type == MessageType.LEAVING) membersStore.load()
             msgs + msg
         }
 
@@ -81,7 +83,7 @@ fun RenderContext.chatPage(room: String, name: String) {
                     color { "white" }
                     fontWeight { bold }
                     margin { large }
-                }) { + "Members" }
+                }) { +"Members" }
                 (::ul.styled {
                     css("list-style: none;")
                     padding { large }
@@ -114,7 +116,7 @@ fun RenderContext.chatPage(room: String, name: String) {
                                             icon({
                                                 size { small }
                                                 margins { right { tiny } }
-                                            }) { fromTheme { cloud }}
+                                            }) { fromTheme { cloud } }
                                             +"online"
                                         }
                                     }
@@ -163,10 +165,21 @@ fun RenderContext.chatPage(room: String, name: String) {
                                     (::div.styled {
                                         color { "#92959e" }
                                     }) {
-                                        + "already "
+                                        +"already "
                                         messagesStore.data.map { it.size }.asText()
-                                        + " messages."
+                                        +" messages."
                                     }
+                                }
+                            }
+                            popover {
+                                trigger {
+                                    clickButton {
+                                        icon { fromTheme { clipboard } }
+                                    } handledBy membersStore.invite
+                                    placement { bottom }
+                                }
+                                content {
+                                    div { +"Invitation link copied to clipboard!" }
                                 }
                             }
                         }
@@ -265,7 +278,7 @@ fun RenderContext.renderMsg(msg: ChatMessage, self: Boolean) {
         width { "90%" }
         position { relative { } }
         margins {
-            if (self) left { "10%" } else right { "10%"}
+            if (self) left { "10%" } else right { "10%" }
         }
         radius { normal }
         after {
@@ -275,16 +288,20 @@ fun RenderContext.renderMsg(msg: ChatMessage, self: Boolean) {
                 color { "transparent" }
             }
             borders { bottom { color { bgColor } } }
-            position { absolute {
-                bottom { "100%" }
-                if (self) right { large } else left { large }
-            } }
+            position {
+                absolute {
+                    bottom { "100%" }
+                    if (self) right { large } else left { large }
+                }
+            }
             height { none }
             width { none }
-            css("""
+            css(
+                """
                 content: " ";
                 pointer-events: none;                
-            """.trimIndent())
+            """.trimIndent()
+            )
         }
     }) {
         +msg.content

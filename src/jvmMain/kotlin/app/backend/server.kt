@@ -105,10 +105,6 @@ fun Application.main() {
                 else call.respond(Json.encodeToString(ListSerializer(String.serializer()), clients.map { it.member }))
             }
         }
-
-        get("/rooms") {
-            call.respond(chatroom.size.toString())
-        }
     }
 }
 

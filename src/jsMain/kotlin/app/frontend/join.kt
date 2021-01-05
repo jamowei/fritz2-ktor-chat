@@ -1,46 +1,31 @@
 package app.frontend
 
 import dev.fritz2.binding.RootStore
-import dev.fritz2.binding.invoke
-import dev.fritz2.binding.watch
 import dev.fritz2.components.*
+import dev.fritz2.dom.html.Keys
 import dev.fritz2.dom.html.RenderContext
-import dev.fritz2.remote.getBody
-import dev.fritz2.remote.http
+import dev.fritz2.dom.key
+import dev.fritz2.identification.uniqueId
 import dev.fritz2.styling.params.styled
-import kotlinx.browser.window
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 
 @ExperimentalCoroutinesApi
-fun RenderContext.joinPage() {
+fun RenderContext.joinPage(room: String? = null) {
 
-    val joinStore = object : RootStore<JoinInfo>(JoinInfo.initial) {
-        val remote = http("/rooms")
+    val joinStore = object : RootStore<String>("") {
 
         val join = handle {
             console.info("join chat room: $it")
-            if(JoinInfo.validator.isValid(it, Unit)) {
-                window.open("/#room=${it.room.trim()}&member=${it.member.trim()}", target = "_blank")
-                JoinInfo.initial
+            if (it.isNotBlank()) {
+                router.navTo(
+                    mapOf("room" to (room ?: uniqueId()), "member" to it.trim())
+                )
+                ""
             } else it
         }
-
-        val load = handle {
-            val count = remote.get().getBody().toInt()
-            it.copy(roomCount = count)
-        }
-
-        init { load() }
     }
-
-    val roomStore = joinStore.sub(L.JoinInfo.room)
-    val memberStore = joinStore.sub(L.JoinInfo.member)
-
-    JoinInfo.validator.msgs.onEach { msgs ->
-        msgs.onEach { window.alert(it.text) }
-    }.watch()
 
     lineUp {
         items {
@@ -75,14 +60,7 @@ fun RenderContext.joinPage() {
                                         fontWeight { bold }
                                         fontSize { large }
                                     }) {
-                                        +"Join or create a chat room"
-                                    }
-                                    (::div.styled {
-                                        color { "#92959e" }
-                                    }) {
-                                        +"There are currently "
-                                        joinStore.data.map { it.roomCount }.asText()
-                                        +" chat rooms."
+                                        +if(room != null) "Join chat room" else "Create a chat room"
                                     }
                                 }
                             }
@@ -94,13 +72,17 @@ fun RenderContext.joinPage() {
                     padding { larger }
                 }) {
                     formControl {
-                        inputField(id = roomStore.id, store = roomStore) {
-                            placeholder("Chat room name")
-                        }
-                    }
-                    formControl {
-                        inputField(id = memberStore.id, store = memberStore) {
+                        inputField(id = "name", store = joinStore) {
                             placeholder("Your name")
+                            keyups.key()
+                                .filter { it.isKey(Keys.Enter) }.map { }
+                                .handledBy(joinStore.join)
+                        }
+                        errorMessage {
+                            joinStore.data.map {
+                                if (it.isBlank()) "Please enter your name."
+                                else ""
+                            }
                         }
                     }
                     flexBox({
@@ -110,7 +92,7 @@ fun RenderContext.joinPage() {
                         box {
                             clickButton({
                             }) {
-                                text("Join")
+                                text(if(room != null) "Join" else "Create")
                                 icon { fromTheme { message } }
                             } handledBy joinStore.join
                         }

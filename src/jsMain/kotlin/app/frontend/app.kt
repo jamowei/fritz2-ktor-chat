@@ -25,9 +25,14 @@ fun main() {
             radius { normal }
         }) {
             router.data.render { params ->
-                if(params["room"].isNullOrBlank() || params["member"].isNullOrBlank())
+                val room = params["room"]
+                val member = params["member"]
+                if(!room.isNullOrBlank() && !member.isNullOrBlank())
+                    chatPage(room, member)
+                else if(!room.isNullOrBlank())
+                    joinPage(room)
+                else
                     joinPage()
-                else chatPage(params["room"]!!, params["member"]!!)
             }
         }
     }.mount("target")
