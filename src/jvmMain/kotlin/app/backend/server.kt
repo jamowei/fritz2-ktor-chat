@@ -8,6 +8,7 @@ import io.ktor.http.cio.websocket.*
 import io.ktor.http.content.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.websocket.*
 import kotlinx.serialization.builtins.ListSerializer
@@ -112,4 +113,9 @@ fun joinMessage(member: String): ChatMessage = ChatMessage("New member $member j
 
 fun leaveMessage(member: String): ChatMessage = ChatMessage("Member $member left the chat.", member, MessageType.LEAVING)
 
-fun main(args: Array<String>): Unit = EngineMain.main(args)
+fun main() {
+    val port = System.getenv("PORT")?.toInt() ?: 8080
+    embeddedServer(Netty, port = port) {
+        main()
+    }.start(wait = true)
+}

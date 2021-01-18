@@ -16,26 +16,12 @@ This project uses the following libraries:
 * [Ktor](https://ktor.io/) - running the server with
 * [Ktor Websockets](https://ktor.io/docs/servers-features-websockets.html) - providing serverside Websocket support
 
-# Features
-TODO
-
 # Run
 To run this application you only need to run the following gradle task:
 ```
 > ./gradlew run 
 ``` 
 Then navigate in your browser to [localhost:8080](http://localhost:8080/)
-
-# Fat Jar
-To build a runnable fat jar with all needed dependencies included you only have to run:
-```
-> ./gradlew shadowJar 
-``` 
-The bundled fat jar is located under `build/libs/fritz2-ktor-chat-1.0-all.jar`.
-You can easily run it by calling:
-```
-> java -jar fritz2-ktor-chat-1.0-all.jar
-```
 
 # Contribution
 If you like this example and how fritz2 works it would be great 
