@@ -29,7 +29,7 @@ fun RenderContext.joinPage(room: String? = null) {
 
     lineUp {
         items {
-            (::div.styled {
+            (::div.styled(prefix = "container") {
                 width { "750px" }
                 radii {
                     topRight { normal }
@@ -37,7 +37,7 @@ fun RenderContext.joinPage(room: String? = null) {
                 }
                 color { "#434651" }
             }) {
-                (::div.styled {
+                (::div.styled(prefix = "header") {
                     padding { large }
                     borders {
                         bottom {
@@ -68,12 +68,13 @@ fun RenderContext.joinPage(room: String? = null) {
                     }
                 }
 
-                (::div.styled {
+                (::div.styled(prefix = "content") {
                     padding { larger }
                 }) {
                     formControl {
+                        label { "Your name" }
                         inputField(id = "name", store = joinStore) {
-                            placeholder("Your name")
+                            placeholder("Enter your chat name")
                             keyups.key()
                                 .filter { it.isKey(Keys.Enter) }.map { }
                                 .handledBy(joinStore.join)

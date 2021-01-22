@@ -13,6 +13,8 @@ import dev.fritz2.remote.getBody
 import dev.fritz2.remote.http
 import dev.fritz2.remote.websocket
 import dev.fritz2.styling.params.styled
+import dev.fritz2.styling.staticStyle
+import dev.fritz2.styling.theme.important
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -22,6 +24,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
+import org.w3c.dom.HTMLTextAreaElement
 
 @ExperimentalCoroutinesApi
 fun RenderContext.chatPage(room: String, name: String) {
@@ -37,7 +40,7 @@ fun RenderContext.chatPage(room: String, name: String) {
         }
 
         val invite = handle {
-            window.navigator.clipboard.writeText(
+            copyToClipboard(
                 "${window.location.protocol}//${window.location.host}/#room=$room"
             )
             it
@@ -72,11 +75,16 @@ fun RenderContext.chatPage(room: String, name: String) {
         }
     }
 
-    lineUp {
+    lineUp({
+        width { "750px" }
+        height { "770px" }
+        background { color { "#444753" } }
+        radius { normal }
+    }, prefix = "container") {
         items {
             // members list
-            (::div.styled {
-                width { "260px" }
+            (::div.styled(prefix = "members") {
+                width { "30%" }
             }) {
                 (::div.styled {
                     fontSize { large }
@@ -87,7 +95,7 @@ fun RenderContext.chatPage(room: String, name: String) {
                 (::ul.styled {
                     css("list-style: none;")
                     padding { large }
-                    height { "770px" }
+                    overflowY { auto }
                 }) {
                     membersStore.data.renderEach {
                         (::li.styled {
@@ -96,10 +104,7 @@ fun RenderContext.chatPage(room: String, name: String) {
                             lineUp {
                                 spacing { small }
                                 items {
-                                    img {
-                                        src("https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_01.jpg")
-                                        alt("avatar")
-                                    }
+                                    avatar(it)
                                     (::div.styled {
                                         margins { top { tiny } }
                                     }) {
@@ -126,51 +131,35 @@ fun RenderContext.chatPage(room: String, name: String) {
                     }
                 }
             }
-
             // chat
-            (::div.styled {
-                width { "490px" }
+            stackUp({
+                width { "70%" }
+                height { "100%" }
                 background { color { "#f2f5f8" } }
-                radii {
-                    topRight { normal }
-                    bottomRight { normal }
-                }
                 color { "#434651" }
-            }) {
-                (::div.styled {
-                    padding { large }
-                    borders {
-                        bottom {
-                            width { "2px" }
-                            style { solid }
-                            color { "white" }
+                margins {
+                    left { none.important }
+                }
+                radii {
+                    right { normal }
+                }
+            }, prefix = "chat") {
+                items {
+                    (::div.styled(prefix = "chat-header") {
+                        height { "15%" }
+                        width { "100%" }
+                        padding { large }
+                        borders {
+                            bottom {
+                                width { "1px" }
+                                style { solid }
+                                color { "#c7c7c7" }
+                            }
                         }
-                    }
-                }) {
-                    lineUp {
-                        items {
-                            img {
-                                src("https://s3-us-west-2.amazonaws.com/s.cdpn.io/195612/chat_avatar_01_green.jpg")
-                                alt("avatar")
-                            }
-                            stackUp {
-                                spacing { none }
-                                items {
-                                    (::div.styled {
-                                        fontWeight { bold }
-                                        fontSize { large }
-                                    }) {
-                                        +"$name in $room"
-                                    }
-                                    (::div.styled {
-                                        color { "#92959e" }
-                                    }) {
-                                        +"already "
-                                        messagesStore.data.map { it.size }.asText()
-                                        +" messages."
-                                    }
-                                }
-                            }
+                    }) {
+                        (::div.styled {
+                            css("float: right")
+                        }) {
                             popover {
                                 trigger {
                                     clickButton {
@@ -183,45 +172,78 @@ fun RenderContext.chatPage(room: String, name: String) {
                                 }
                             }
                         }
-                    }
-                }
-                (::div.styled {
-                    paddings {
-                        right { larger }
-                    }
-                    borders {
-                        bottom {
-                            width { "2px" }
-                            style { solid }
-                            color { "white" }
-                        }
-                    }
-                    overflowY { scroll }
-                    height { "575px" }
-                }) {
-                    (::ul.styled {
-                        css("list-style: none;")
-                    }) {
-                        messagesStore.data.renderEach { msg ->
-                            (::li.styled {
-
-                            }) {
-                                renderMsg(msg, (msg.member == name))
+                        lineUp {
+                            items {
+                                avatar(name)
+                                stackUp {
+                                    spacing { none }
+                                    items {
+                                        (::div.styled {
+                                            fontWeight { bold }
+                                            fontSize { large }
+                                        }) {
+                                            +name
+                                        }
+                                        (::div.styled {
+                                            color { "#92959e" }
+                                        }) {
+                                            +"already "
+                                            messagesStore.data.map { it.size }.asText()
+                                            +" messages."
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
-                }
-                (::div.styled {
-                    padding { larger }
-                }) {
-                    inputField({
-                        width { full }
+                    (::div.styled(prefix = "chat-content") {
+                        height { "75%" }
+                        width { "100%" }
+                        paddings {
+                            right { larger }
+                        }
+                        background { color { "#ffffff" } }
+                        borders {
+                            bottom {
+                                width { "1px" }
+                                style { solid }
+                                color { "#c7c7c7" }
+                            }
+                        }
+                        margins {
+                            top { none.important }
+                        }
+                        overflowY { scroll }
                     }) {
-                        base {
-                            keyups.key()
-                                .filter { it.isKey(Keys.Enter) }
-                                .map { ChatMessage(domNode.value, name).also { domNode.value = "" } }
-                                .handledBy(messagesStore.send)
+                        (::ul.styled {
+                            css("list-style: none;")
+                        }) {
+                            messagesStore.data.renderEach { msg ->
+                                (::li.styled {
+
+                                }) {
+                                    renderMsg(msg, (msg.member == name))
+                                }
+                            }
+                        }
+                    }
+                    (::div.styled(prefix = "chat-message") {
+                        height { "10%" }
+                        width { "100%" }
+                        paddings {
+                            left { larger }
+                            right { larger }
+                        }
+                    }) {
+                        inputField({
+                            width { full }
+                        }) {
+                            base {
+                                keyups.key()
+                                    .filter { it.isKey(Keys.Enter) }
+                                    .map { ChatMessage(domNode.value, name).also { domNode.value = "" } }
+                                    .handledBy(messagesStore.send)
+                            }
                         }
                     }
                 }
@@ -305,5 +327,32 @@ fun RenderContext.renderMsg(msg: ChatMessage, self: Boolean) {
         }
     }) {
         +msg.content
+    }
+}
+
+fun RenderContext.avatar(name: String) {
+    (::img.styled {
+        radius { "50%" }
+        background { color { "#5eb97a" } }
+        padding { "3px" }
+    }) {
+        src("http://www.avatarpro.biz/avatar/${name.hashCode()})?s=55")
+        alt("avatar")
+    }
+}
+
+fun copyToClipboard(text: String) {
+    document.body?.let { body ->
+        (document.createElement("textarea") as HTMLTextAreaElement).apply {
+            value = text
+            setAttribute("readonly", "")
+            style.position = "absolute"
+            style.left = "-9999px"
+            body.appendChild(this)
+            select()
+            setSelectionRange(0, 999999)
+            document.execCommand("copy")
+            body.removeChild(this)
+        }
     }
 }

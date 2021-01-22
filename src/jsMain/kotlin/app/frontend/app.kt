@@ -1,6 +1,5 @@
 package app.frontend
 
-import dev.fritz2.dom.mount
 import dev.fritz2.routing.router
 import dev.fritz2.styling.params.styled
 import dev.fritz2.styling.theme.DefaultTheme
@@ -20,8 +19,7 @@ fun main() {
                 horizontal { auto }
             }
             width { "750px" }
-            height { "760px" }
-            background { color { "#444753" } }
+            background { color { "#ffffff" } }
             radius { normal }
         }) {
             router.data.render { params ->
@@ -35,5 +33,5 @@ fun main() {
                     joinPage()
             }
         }
-    }.mount("target")
+    }
 }
