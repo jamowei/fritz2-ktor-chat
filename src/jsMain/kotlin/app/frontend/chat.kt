@@ -13,8 +13,6 @@ import dev.fritz2.remote.getBody
 import dev.fritz2.remote.http
 import dev.fritz2.remote.websocket
 import dev.fritz2.styling.params.styled
-import dev.fritz2.styling.staticStyle
-import dev.fritz2.styling.theme.important
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -75,6 +73,187 @@ fun RenderContext.chatPage(room: String, name: String) {
         }
     }
 
+    fun RenderContext.chatMessage() {
+        (::div.styled(prefix = "chat-message") {
+            height { "10%" }
+            width { "100%" }
+            padding { larger }
+        }) {
+            inputField({
+                width { full }
+            }) {
+                base {
+                    keyups.key()
+                        .filter { it.isKey(Keys.Enter) }
+                        .map { ChatMessage(domNode.value, name).also { domNode.value = "" } }
+                        .handledBy(messagesStore.send)
+                }
+            }
+        }
+    }
+
+    fun RenderContext.chatContent() {
+        (::div.styled(prefix = "chat-content") {
+            height { "75%" }
+            width { "100%" }
+            paddings {
+                right { larger }
+            }
+            background { color { "#ffffff" } }
+            borders {
+                bottom {
+                    width { "1px" }
+                    style { solid }
+                    color { "#c7c7c7" }
+                }
+            }
+            overflowY { scroll }
+        }) {
+            (::ul.styled {
+                css("list-style: none;")
+            }) {
+                messagesStore.data.renderEach { msg ->
+                    (::li.styled {
+
+                    }) {
+                        renderMsg(msg, (msg.member == name))
+                    }
+                }
+            }
+        }
+    }
+
+    fun RenderContext.chatInvitation() {
+        (::div.styled {
+            css("float: right")
+        }) {
+            popover {
+                trigger {
+                    clickButton {
+                        icon { fromTheme { share } }
+                        text("Invite")
+                    } handledBy membersStore.invite
+                    placement { bottom }
+                }
+                content {
+                    div { +"Invitation link copied to clipboard!" }
+                }
+            }
+        }
+    }
+
+    fun RenderContext.chatTitle() {
+        (::div.styled(prefix = "chat-header") {
+            height { "15%" }
+            width { "100%" }
+            padding { large }
+            borders {
+                bottom {
+                    width { "1px" }
+                    style { solid }
+                    color { "#c7c7c7" }
+                }
+            }
+        }) {
+            chatInvitation()
+            lineUp {
+                items {
+                    avatar(name)
+                    stackUp {
+                        spacing { none }
+                        items {
+                            (::div.styled {
+                                fontWeight { bold }
+                                fontSize { large }
+                            }) {
+                                +name
+                            }
+                            (::div.styled {
+                                color { "#92959e" }
+                            }) {
+                                messagesStore.data.map {
+                                    if (it.isEmpty()) "no messages"
+                                    else "${it.size} messages"
+                                }.asText()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun RenderContext.chat() {
+        stackUp({
+            width { "70%" }
+            height { "100%" }
+            background { color { "#f2f5f8" } }
+            color { "#434651" }
+            radii {
+                right { normal }
+            }
+        }, prefix = "chat") {
+            spacing { none }
+            items {
+                chatTitle()
+                chatContent()
+                chatMessage()
+            }
+        }
+    }
+
+    fun RenderContext.members() {
+        (::div.styled(prefix = "members") {
+            width { "30%" }
+        }) {
+            (::div.styled {
+                fontSize { large }
+                color { "white" }
+                fontWeight { bold }
+                margin { large }
+            }) { +"Members" }
+            (::ul.styled {
+                css("list-style: none;")
+                padding { large }
+                overflowY { auto }
+            }) {
+                membersStore.data.renderEach {
+                    (::li.styled {
+                        paddings { bottom { large } }
+                    }) {
+                        lineUp {
+                            spacing { small }
+                            items {
+                                avatar(it)
+                                (::div.styled {
+                                    margins { top { tiny } }
+                                }) {
+                                    (::div.styled {
+                                        fontSize { normal }
+                                        color { "white" }
+                                        fontWeight { semiBold }
+                                    }) { +it }
+                                    (::div.styled {
+                                        margins { top { "-0.25rem" } }
+                                        fontSize { small }
+                                        color { "#92959e" }
+                                    }) {
+                                        icon({
+                                            size { small }
+                                            margins { right { tiny } }
+                                        }) { fromTheme { cloud } }
+                                        +"online"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
     lineUp({
         width { "750px" }
         height { "770px" }
@@ -82,172 +261,8 @@ fun RenderContext.chatPage(room: String, name: String) {
         radius { normal }
     }, prefix = "container") {
         items {
-            // members list
-            (::div.styled(prefix = "members") {
-                width { "30%" }
-            }) {
-                (::div.styled {
-                    fontSize { large }
-                    color { "white" }
-                    fontWeight { bold }
-                    margin { large }
-                }) { +"Members" }
-                (::ul.styled {
-                    css("list-style: none;")
-                    padding { large }
-                    overflowY { auto }
-                }) {
-                    membersStore.data.renderEach {
-                        (::li.styled {
-                            paddings { bottom { large } }
-                        }) {
-                            lineUp {
-                                spacing { small }
-                                items {
-                                    avatar(it)
-                                    (::div.styled {
-                                        margins { top { tiny } }
-                                    }) {
-                                        (::div.styled {
-                                            fontSize { normal }
-                                            color { "white" }
-                                            fontWeight { semiBold }
-                                        }) { +it }
-                                        (::div.styled {
-                                            margins { top { "-0.25rem" } }
-                                            fontSize { small }
-                                            color { "#92959e" }
-                                        }) {
-                                            icon({
-                                                size { small }
-                                                margins { right { tiny } }
-                                            }) { fromTheme { cloud } }
-                                            +"online"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            // chat
-            stackUp({
-                width { "70%" }
-                height { "100%" }
-                background { color { "#f2f5f8" } }
-                color { "#434651" }
-                margins {
-                    left { none.important }
-                }
-                radii {
-                    right { normal }
-                }
-            }, prefix = "chat") {
-                items {
-                    (::div.styled(prefix = "chat-header") {
-                        height { "15%" }
-                        width { "100%" }
-                        padding { large }
-                        borders {
-                            bottom {
-                                width { "1px" }
-                                style { solid }
-                                color { "#c7c7c7" }
-                            }
-                        }
-                    }) {
-                        (::div.styled {
-                            css("float: right")
-                        }) {
-                            popover {
-                                trigger {
-                                    clickButton {
-                                        icon { fromTheme { clipboard } }
-                                    } handledBy membersStore.invite
-                                    placement { bottom }
-                                }
-                                content {
-                                    div { +"Invitation link copied to clipboard!" }
-                                }
-                            }
-                        }
-                        lineUp {
-                            items {
-                                avatar(name)
-                                stackUp {
-                                    spacing { none }
-                                    items {
-                                        (::div.styled {
-                                            fontWeight { bold }
-                                            fontSize { large }
-                                        }) {
-                                            +name
-                                        }
-                                        (::div.styled {
-                                            color { "#92959e" }
-                                        }) {
-                                            +"already "
-                                            messagesStore.data.map { it.size }.asText()
-                                            +" messages."
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    (::div.styled(prefix = "chat-content") {
-                        height { "75%" }
-                        width { "100%" }
-                        paddings {
-                            right { larger }
-                        }
-                        background { color { "#ffffff" } }
-                        borders {
-                            bottom {
-                                width { "1px" }
-                                style { solid }
-                                color { "#c7c7c7" }
-                            }
-                        }
-                        margins {
-                            top { none.important }
-                        }
-                        overflowY { scroll }
-                    }) {
-                        (::ul.styled {
-                            css("list-style: none;")
-                        }) {
-                            messagesStore.data.renderEach { msg ->
-                                (::li.styled {
-
-                                }) {
-                                    renderMsg(msg, (msg.member == name))
-                                }
-                            }
-                        }
-                    }
-                    (::div.styled(prefix = "chat-message") {
-                        height { "10%" }
-                        width { "100%" }
-                        paddings {
-                            left { larger }
-                            right { larger }
-                        }
-                    }) {
-                        inputField({
-                            width { full }
-                        }) {
-                            base {
-                                keyups.key()
-                                    .filter { it.isKey(Keys.Enter) }
-                                    .map { ChatMessage(domNode.value, name).also { domNode.value = "" } }
-                                    .handledBy(messagesStore.send)
-                            }
-                        }
-                    }
-                }
-            }
+            members()
+            chat()
         }
     }
 }
@@ -330,6 +345,8 @@ fun RenderContext.renderMsg(msg: ChatMessage, self: Boolean) {
     }
 }
 
+
+@ExperimentalCoroutinesApi
 fun RenderContext.avatar(name: String) {
     (::img.styled {
         radius { "50%" }
