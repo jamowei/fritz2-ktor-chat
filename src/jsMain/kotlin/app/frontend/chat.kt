@@ -66,22 +66,31 @@ fun RenderContext.chatPage(room: String, name: String) {
             msgs
         }
 
+        val scrollDown = handle { msgs ->
+            document.getElementById("chat-messages")?.let {
+                it.scrollTo(0.0, it.scrollHeight.toDouble())
+            }
+            msgs
+        }
+
         init {
             join()
             session.messages.body.map { ChatMessage.fromJson(it) } handledBy receive
             membersStore.load()
+            syncBy(scrollDown)
         }
     }
 
     fun RenderContext.chatSend() {
         (::div.styled(prefix = "chat-message") {
-            height { "10%" }
-            width { "100%" }
+            height { "135px" }
+            width { full }
             padding { larger }
         }) {
-            inputField({
+            textArea ({
                 width { full }
             }) {
+                resizeBehavior { none }
                 base {
                     keyups.key()
                         .filter { it.isKey(Keys.Enter) }
@@ -157,22 +166,17 @@ fun RenderContext.chatPage(room: String, name: String) {
                 }
                 height { none }
                 width { none }
-                css(
-                    """
-                content: " ";
-                pointer-events: none;                
-            """.trimIndent()
-                )
+                css("""content: " "; pointer-events: none;""")
             }
         }) {
             +msg.content
         }
     }
 
-    fun RenderContext.chatContent() {
-        (::div.styled(prefix = "chat-content") {
-            height { "75%" }
-            width { "100%" }
+    fun RenderContext.chatMessages() {
+        (::div.styled(id="chat-messages", prefix = "chat-messages") {
+            height { full }
+            width { full }
             paddings {
                 right { larger }
             }
@@ -228,8 +232,9 @@ fun RenderContext.chatPage(room: String, name: String) {
 
     fun RenderContext.chatTitle() {
         (::div.styled(prefix = "chat-header") {
-            height { "15%" }
-            width { "100%" }
+            minHeight { "90px" }
+            maxHeight { "120px" }
+            width { full }
             padding { large }
             borders {
                 bottom {
@@ -270,7 +275,7 @@ fun RenderContext.chatPage(room: String, name: String) {
     fun RenderContext.chat() {
         stackUp({
             width { "70%" }
-            height { "100%" }
+            height { full }
             background { color { "#f2f5f8" } }
             color { "#434651" }
             radii {
@@ -280,7 +285,7 @@ fun RenderContext.chatPage(room: String, name: String) {
             spacing { none }
             items {
                 chatTitle()
-                chatContent()
+                chatMessages()
                 chatSend()
             }
         }
@@ -300,6 +305,7 @@ fun RenderContext.chatPage(room: String, name: String) {
                 css("list-style: none;")
                 padding { large }
                 overflowY { auto }
+                overflowX { hidden }
             }) {
                 membersStore.data.renderEach {
                     (::li.styled {
@@ -339,8 +345,7 @@ fun RenderContext.chatPage(room: String, name: String) {
 
 
     lineUp({
-        width { "750px" }
-        height { "770px" }
+        height { "calc(100vh - 30px)" }
         background { color { "#444753" } }
         radius { normal }
     }, prefix = "container") {

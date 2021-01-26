@@ -1,21 +1,15 @@
 package app.frontend
 
 import dev.fritz2.binding.RootStore
-import dev.fritz2.binding.watch
 import dev.fritz2.components.*
-import dev.fritz2.dom.Tag
 import dev.fritz2.dom.html.Keys
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.key
 import dev.fritz2.identification.uniqueId
 import dev.fritz2.styling.params.styled
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
-import org.w3c.dom.HTMLElement
 
 @ExperimentalCoroutinesApi
 fun RenderContext.joinPage(room: String? = null) {
@@ -23,8 +17,8 @@ fun RenderContext.joinPage(room: String? = null) {
     val joinStore = object : RootStore<String>("") {
 
         val join = handle {
-            console.info("join chat room: $it")
             if (it.isNotBlank()) {
+                console.info("join chat room: $it")
                 router.navTo(
                     mapOf("room" to (room ?: uniqueId()), "member" to it.trim())
                 )
@@ -77,8 +71,6 @@ fun RenderContext.joinPage(room: String? = null) {
                     keyups.key()
                         .filter { it.isKey(Keys.Enter) }.map { }
                         .handledBy(joinStore.join)
-                    //sets focus after 300ms
-                    delay(300) { domNode.focus() }
                 }
                 errorMessage {
                     joinStore.data.map {
@@ -104,7 +96,7 @@ fun RenderContext.joinPage(room: String? = null) {
 
     lineUp {
         items {
-            (::div.styled(prefix = "join") {
+            (::div.styled(prefix = "container") {
                 width { "750px" }
                 radii {
                     topRight { normal }
@@ -117,8 +109,4 @@ fun RenderContext.joinPage(room: String? = null) {
             }
         }
     }
-}
-
-fun <E: HTMLElement> Tag<E>.delay(timeMillis: Long, consumer: (E) -> Unit) {
-    flow<Unit> { delay(timeMillis) }.onEach { consumer(domNode) }.watch()
 }
