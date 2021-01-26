@@ -73,7 +73,7 @@ fun RenderContext.chatPage(room: String, name: String) {
         }
     }
 
-    fun RenderContext.chatMessage() {
+    fun RenderContext.chatSend() {
         (::div.styled(prefix = "chat-message") {
             height { "10%" }
             width { "100%" }
@@ -89,6 +89,83 @@ fun RenderContext.chatPage(room: String, name: String) {
                         .handledBy(messagesStore.send)
                 }
             }
+        }
+    }
+
+    fun RenderContext.chatMessage(msg: ChatMessage, self: Boolean) {
+        val bgColor = if (self) "#94c2ed" else "#86bb71"
+
+        lineUp({
+            margins { bottom { normal } }
+            textAlign { if (self) right else left }
+            fontSize { small }
+        }) {
+            reverse { self }
+            spacing { smaller }
+            items {
+                if (!self) {
+                    icon({
+                        size { normal }
+                        margins { top { "0.1rem" } }
+                    }) { fromTheme { user } }
+                }
+                (::span.styled {
+                    fontWeight { semiBold }
+                }) {
+                    +msg.member
+                }
+                (::span.styled {
+                    color { "#a8aab1" }
+                }) {
+                    icon({
+                        size { small }
+                        margins { right { tiny } }
+                    }) { fromTheme { clock } }
+                    +msg.created.toString()
+                }
+            }
+        }
+        (::div.styled {
+            boxShadow { flat }
+            background { color { bgColor } }
+            color { "white" }
+            paddings {
+                vertical { smaller }
+                horizontal { small }
+            }
+            lineHeight { huge }
+            fontSize { normal }
+            margins { bottom { larger } }
+            width { "90%" }
+            position { relative { } }
+            margins {
+                if (self) left { "10%" } else right { "10%" }
+            }
+            radius { normal }
+            after {
+                border {
+                    style { solid }
+                    width { "10px" }
+                    color { "transparent" }
+                }
+                borders { bottom { color { bgColor } } }
+                position {
+                    absolute {
+                        bottom { "100%" }
+                        if (self) right { large } else left { large }
+                    }
+                }
+                height { none }
+                width { none }
+                css(
+                    """
+                content: " ";
+                pointer-events: none;                
+            """.trimIndent()
+                )
+            }
+        }) {
+            +msg.content
         }
     }
 
@@ -113,17 +190,24 @@ fun RenderContext.chatPage(room: String, name: String) {
                 css("list-style: none;")
             }) {
                 messagesStore.data.renderEach { msg ->
-                    (::li.styled {
-
-                    }) {
-                        renderMsg(msg, (msg.member == name))
-                    }
+                    li { chatMessage(msg, (msg.member == name)) }
                 }
             }
         }
     }
 
-    fun RenderContext.chatInvitation() {
+    fun RenderContext.avatar(name: String) {
+        (::img.styled {
+            radius { "50%" }
+            background { color { "#5eb97a" } }
+            padding { "3px" }
+        }) {
+            src("http://www.avatarpro.biz/avatar/${name.hashCode()})?s=55")
+            alt("avatar")
+        }
+    }
+
+    fun RenderContext.chatInvite() {
         (::div.styled {
             css("float: right")
         }) {
@@ -155,7 +239,7 @@ fun RenderContext.chatPage(room: String, name: String) {
                 }
             }
         }) {
-            chatInvitation()
+            chatInvite()
             lineUp {
                 items {
                     avatar(name)
@@ -197,7 +281,7 @@ fun RenderContext.chatPage(room: String, name: String) {
             items {
                 chatTitle()
                 chatContent()
-                chatMessage()
+                chatSend()
             }
         }
     }
@@ -264,97 +348,6 @@ fun RenderContext.chatPage(room: String, name: String) {
             members()
             chat()
         }
-    }
-}
-
-@ExperimentalCoroutinesApi
-fun RenderContext.renderMsg(msg: ChatMessage, self: Boolean) {
-    val bgColor = if (self) "#94c2ed" else "#86bb71"
-
-    lineUp({
-        margins { bottom { normal } }
-        textAlign { if (self) right else left }
-        fontSize { small }
-    }) {
-        reverse { self }
-        spacing { smaller }
-        items {
-            if (!self) {
-                icon({
-                    size { normal }
-                    margins { top { "0.1rem" } }
-                }) { fromTheme { user } }
-            }
-            (::span.styled {
-                fontWeight { semiBold }
-            }) {
-                +msg.member
-            }
-            (::span.styled {
-                color { "#a8aab1" }
-            }) {
-                icon({
-                    size { small }
-                    margins { right { tiny } }
-                }) { fromTheme { clock } }
-                +msg.created.toString()
-            }
-        }
-    }
-    (::div.styled {
-        boxShadow { flat }
-        background { color { bgColor } }
-        color { "white" }
-        paddings {
-            vertical { smaller }
-            horizontal { small }
-        }
-        lineHeight { huge }
-        fontSize { normal }
-        margins { bottom { larger } }
-        width { "90%" }
-        position { relative { } }
-        margins {
-            if (self) left { "10%" } else right { "10%" }
-        }
-        radius { normal }
-        after {
-            border {
-                style { solid }
-                width { "10px" }
-                color { "transparent" }
-            }
-            borders { bottom { color { bgColor } } }
-            position {
-                absolute {
-                    bottom { "100%" }
-                    if (self) right { large } else left { large }
-                }
-            }
-            height { none }
-            width { none }
-            css(
-                """
-                content: " ";
-                pointer-events: none;                
-            """.trimIndent()
-            )
-        }
-    }) {
-        +msg.content
-    }
-}
-
-
-@ExperimentalCoroutinesApi
-fun RenderContext.avatar(name: String) {
-    (::img.styled {
-        radius { "50%" }
-        background { color { "#5eb97a" } }
-        padding { "3px" }
-    }) {
-        src("http://www.avatarpro.biz/avatar/${name.hashCode()})?s=55")
-        alt("avatar")
     }
 }
 
