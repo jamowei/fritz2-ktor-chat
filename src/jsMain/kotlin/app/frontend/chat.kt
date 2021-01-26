@@ -27,7 +27,7 @@ import org.w3c.dom.HTMLTextAreaElement
 @ExperimentalCoroutinesApi
 fun RenderContext.chatPage(room: String, name: String) {
 
-    document.title = "Chat $name | $room"
+    document.title = "Chat $name | ${room.take(5)}"
 
     val membersStore = object : RootStore<List<String>>(emptyList()) {
         val remote = http("/members/$room")
