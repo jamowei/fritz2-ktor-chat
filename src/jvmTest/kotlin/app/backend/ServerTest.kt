@@ -1,7 +1,7 @@
 package app.backend
 
-import app.model.ChatMessage
-import app.model.MessageType
+import app.shared.ChatMessage
+import app.shared.MessageType
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.http.cio.websocket.*
@@ -28,11 +28,11 @@ class ServerTest {
 
             fun checkMembers(expected: List<String>) {
                 handleRequest(HttpMethod.Get, "members/$chatroom").apply {
-                    assertEquals(200, response.status()?.value)
                     assertEquals(
                         expected,
                         Json.decodeFromString(ListSerializer(String.serializer()), response.content ?: "[1]")
                     )
+                    assertEquals(200, response.status()?.value)
                 }
             }
 
@@ -102,7 +102,10 @@ class ServerTest {
                 delay(200)
                 checkMembers(listOf(memberA))
             }
-            checkMembers(emptyList())
+            // check if room is closed
+            handleRequest(HttpMethod.Get, "members/$chatroom").apply {
+                assertEquals(400, response.status()?.value)
+            }
         }
     }
 }
