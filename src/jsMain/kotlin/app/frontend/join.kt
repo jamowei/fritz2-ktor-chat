@@ -68,7 +68,7 @@ fun RenderContext.joinPage(room: String? = null) {
                                 fontWeight { bold }
                                 fontSize { large }
                             }) {
-                                +if (room != null) "Join chat room" else "Create a chat room"
+                                +if (room != null) "Join chat room $room" else "Create a chat room"
                             }
                         }
                     }
