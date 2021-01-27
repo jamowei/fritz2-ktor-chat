@@ -19,6 +19,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
@@ -87,7 +90,7 @@ fun RenderContext.chatPage(room: String, name: String) {
             width { full }
             padding { larger }
         }) {
-            textArea ({
+            textArea({
                 width { full }
             }) {
                 resizeBehavior { none }
@@ -130,7 +133,7 @@ fun RenderContext.chatPage(room: String, name: String) {
                         size { small }
                         margins { right { tiny } }
                     }) { fromTheme { clock } }
-                    +msg.created.toString()
+                    +msg.created.print()
                 }
             }
         }
@@ -174,7 +177,7 @@ fun RenderContext.chatPage(room: String, name: String) {
     }
 
     fun RenderContext.chatMessages() {
-        (::div.styled(id="chat-messages", prefix = "chat-messages") {
+        (::div.styled(id = "chat-messages", prefix = "chat-messages") {
             height { full }
             width { full }
             paddings {
@@ -368,3 +371,7 @@ fun copyToClipboard(text: String) {
         }
     }
 }
+
+fun Instant.print(): String =
+    this.toLocalDateTime(TimeZone.currentSystemDefault())
+        .let { "${it.hour}:${it.minute}" }
