@@ -8,12 +8,12 @@ group = "dev.fritz2"
 version = "1.0"
 
 repositories {
-    mavenLocal()
     jcenter()
     mavenCentral()
-    maven { url = uri("https://dl.bintray.com/kotlin/kotlin-js-wrappers") }
-    maven { url = uri("https://dl.bintray.com/kotlin/kotlinx") }
-    maven { url = uri("https://dl.bintray.com/kotlin/ktor") }
+    maven("https://oss.jfrog.org/artifactory/jfrog-dependencies")
+    maven("https://dl.bintray.com/kotlin/kotlin-js-wrappers")
+    maven("https://dl.bintray.com/kotlin/kotlinx")
+    maven("https://dl.bintray.com/kotlin/ktor")
 }
 
 application {
@@ -50,8 +50,7 @@ kotlin {
 
         val commonMain by getting {
             dependencies {
-                implementation("dev.fritz2:core:0.9-SNAPSHOT")
-//                implementation("dev.fritz2:core:0.8")
+                implementation("dev.fritz2:components:0.9-SNAPSHOT")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:$dateTimeVersion")
             }
@@ -77,7 +76,6 @@ kotlin {
         }
         val jsMain by getting {
             dependencies {
-                implementation("dev.fritz2:components:0.9-SNAPSHOT")
             }
         }
         val jsTest by getting {
