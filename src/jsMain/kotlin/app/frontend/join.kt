@@ -5,7 +5,6 @@ import dev.fritz2.components.*
 import dev.fritz2.dom.html.Keys
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.dom.key
-import dev.fritz2.identification.uniqueId
 import dev.fritz2.styling.params.styled
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.filter
@@ -20,7 +19,7 @@ fun RenderContext.joinPage(room: String? = null) {
             if (it.isNotBlank()) {
                 console.info("join chat room: $it")
                 router.navTo(
-                    mapOf("room" to (room ?: uniqueId()), "member" to it.trim())
+                    mapOf("room" to (room ?: randomId()), "member" to it.trim())
                 )
                 ""
             } else it

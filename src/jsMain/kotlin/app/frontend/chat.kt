@@ -27,7 +27,7 @@ import org.w3c.dom.HTMLTextAreaElement
 @ExperimentalCoroutinesApi
 fun RenderContext.chatPage(room: String, name: String) {
 
-    document.title = "Chat $name | ${room.take(5)}"
+    document.title = "Chat $name | $room"
 
     val membersStore = object : RootStore<List<String>>(emptyList()) {
         val remote = http("/members/$room")
@@ -212,20 +212,17 @@ fun RenderContext.chatPage(room: String, name: String) {
     }
 
     fun RenderContext.chatInvite() {
-        (::div.styled {
-            css("float: right")
-        }) {
+        div {
+            inlineStyle("float: right;")
             popover {
-                trigger {
+                toggle {
                     clickButton {
                         icon { fromTheme { share } }
                         text("Invite")
                     } handledBy membersStore.invite
-                    placement { bottom }
                 }
-                content {
-                    div { +"Invitation link copied to clipboard!" }
-                }
+                placement { bottom }
+                content("Invitation link copied to clipboard!")
             }
         }
     }
