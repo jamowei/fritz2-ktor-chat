@@ -29,7 +29,7 @@ kotlin {
             useJUnit()
         }
     }
-    js(LEGACY) {
+    js {
         browser {
             runTask {
                 devServer = org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig.DevServer(
