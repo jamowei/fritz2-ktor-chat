@@ -39,3 +39,9 @@ object InstantSerializer : KSerializer<Instant> {
     override fun serialize(encoder: Encoder, value: Instant) = encoder.encodeString(value.toString())
     override fun deserialize(decoder: Decoder): Instant = Instant.parse(decoder.decodeString())
 }
+
+@Lenses
+data class Chat(
+    val members: List<String> = emptyList(),
+    val messages: List<ChatMessage> = emptyList()
+)

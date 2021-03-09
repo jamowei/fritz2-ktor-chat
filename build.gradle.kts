@@ -8,6 +8,7 @@ group = "dev.fritz2"
 version = "1.0"
 
 repositories {
+    mavenLocal()
     jcenter()
     mavenCentral()
     maven("https://oss.jfrog.org/artifactory/jfrog-dependencies")

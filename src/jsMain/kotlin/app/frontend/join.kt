@@ -82,11 +82,7 @@ fun RenderContext.joinPage(room: String? = null) {
             padding { larger }
         }) {
             formControl {
-                label { "Your name" }
-                errorMessage {
-                    //FIXME: when internal component validation is available
-                    joinStore.validationMessage()?.map { it?.message ?: "" } ?: flowOf("")
-                }
+                label("Your name")
                 inputField(id = "name", store = joinStore) {
                     placeholder("Enter your chat name")
                     keyups.key()
