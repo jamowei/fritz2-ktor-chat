@@ -1,29 +1,20 @@
 package app.frontend
 
+import app.frontend.views.joinPage
 import app.shared.ChatMessage
 import app.shared.L
 import dev.fritz2.components.*
 import dev.fritz2.components.icon
-import dev.fritz2.dom.html.Keys
-import dev.fritz2.dom.html.RenderContext
-import dev.fritz2.dom.key
 import dev.fritz2.dom.values
-import dev.fritz2.routing.router
 import dev.fritz2.styling.params.styled
 import dev.fritz2.styling.theme.DefaultTheme
 import dev.fritz2.styling.theme.render
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.shareIn
-import member
-import members
+import app.frontend.views.member
+import app.frontend.views.members
+import dev.fritz2.styling.style
 import navSection
-
-val defaultRoute = mapOf<String, String>()
-val router = router(defaultRoute)
 
 @ExperimentalCoroutinesApi
 fun main() {
@@ -50,38 +41,45 @@ fun main() {
 
             nav {
                 navSection("Members")
-                appContext.render { store -> members(store.sub(L.Chat.members)) }
+                ChatStore.data.render { chat  ->
+                    if (chat.inRoom()) members(ChatStore.sub(L.Chat.members))
+                }
             }
 
             footer {
-                appContext.render { store -> member(store.name) }
+                ChatStore.data.render { chat ->
+                    if (chat.member.isNotBlank()) member(chat.member)
+                }
             }
 
             main {
-                appContext.render { chatStore ->
-                    if (chatStore.inRoom) {
+                ChatStore.data.render { chat  ->
+                    if (chat.inRoom()) {
                         ul {
-                            chatStore.sub(L.Chat.messages).data.render {
+                            ChatStore.sub(L.Chat.messages).data.render {
                                 it.forEach {
                                     li { +it.content }
                                 }
                             }
                         }
                     }
-                    else if (chatStore.room.isNotBlank())
-                        joinPage(chatStore.room)
+                    else if (chat.room.isNotBlank())
+                        joinPage(chat.room)
                     else
                         joinPage()
                 }
             }
 
             tabs {
-                appContext.render { store ->
-                    inputField {
-                        events {
-                            changes.values().map {
-                                ChatMessage(it, store.name)
-                            } handledBy store.send                        }
+                ChatStore.data.render { chat  ->
+                    if (chat.inRoom()) {
+                        inputField {
+                            events {
+                                changes.values().map {
+                                    ChatMessage(it, chat.member)
+                                } handledBy ChatStore.send
+                            }
+                        }
                     }
                 }
             }

@@ -1,5 +1,7 @@
-package app.frontend
+package app.frontend.views
 
+import app.frontend.ChatStore
+import app.shared.Chat
 import app.shared.ChatMessage
 import app.shared.L
 import dev.fritz2.components.*
@@ -86,12 +88,12 @@ fun RenderContext.chatMessage(msg: ChatMessage, self: Boolean) {
 }
 
 @ExperimentalCoroutinesApi
-fun RenderContext.chatPage(chatStore: ChatStore) {
+fun RenderContext.chatPage() {
     (::ul.styled {
         css("list-style: none;")
     }) {
-        chatStore.sub(L.Chat.messages).data.renderEach { msg ->
-            li { chatMessage(msg, (msg.member == chatStore.name)) }
+        ChatStore.sub(L.Chat.messages).data.renderEach { msg ->
+            li { chatMessage(msg, (msg.member == ChatStore.current.member)) }
         }
     }
 }

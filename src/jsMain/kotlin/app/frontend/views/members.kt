@@ -1,3 +1,5 @@
+package app.frontend.views
+
 import dev.fritz2.binding.Store
 import dev.fritz2.components.icon
 import dev.fritz2.components.lineUp

@@ -42,6 +42,10 @@ object InstantSerializer : KSerializer<Instant> {
 
 @Lenses
 data class Chat(
+    val room: String = "",
+    val member: String = "",
     val members: List<String> = emptyList(),
     val messages: List<ChatMessage> = emptyList()
-)
+) {
+    fun inRoom(): Boolean = room.isNotBlank() && member.isNotBlank()
+}

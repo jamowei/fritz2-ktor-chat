@@ -1,5 +1,6 @@
-package app.frontend
+package app.frontend.views
 
+import app.frontend.router
 import dev.fritz2.binding.RootStore
 import dev.fritz2.components.*
 import dev.fritz2.components.validation.*
@@ -10,7 +11,6 @@ import dev.fritz2.identification.inspect
 import dev.fritz2.styling.params.styled
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 
 @ExperimentalCoroutinesApi
