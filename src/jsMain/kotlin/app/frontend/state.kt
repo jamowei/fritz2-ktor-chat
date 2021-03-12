@@ -5,13 +5,13 @@ import app.shared.ChatMessage
 import app.shared.MessageType
 import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.invoke
-import dev.fritz2.remote.body
-import dev.fritz2.remote.getBody
-import dev.fritz2.remote.http
-import dev.fritz2.remote.websocket
+import dev.fritz2.components.randomId
+import dev.fritz2.remote.*
 import dev.fritz2.routing.router
 import kotlinx.browser.document
 import kotlinx.browser.window
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
@@ -21,21 +21,23 @@ val defaultRoute = mapOf<String, String>()
 val router = router(defaultRoute)
 
 object ChatStore : RootStore<Chat>(Chat(router.current["room"].orEmpty(), router.current["member"].orEmpty())) {
-    private val membersService by lazy { http("/members/${current.room}") }
-    private val session by lazy {
-        websocket("ws://${window.location.host}/chat/${current.room}").connect().also {
-            it.messages.body.map { msg -> ChatMessage.fromJson(msg) } handledBy receive
-        }
-    }
+    private lateinit var membersService: Request
+    private lateinit var session: Session
 
     private suspend fun loadUsers(member: String): List<String> =
         Json.decodeFromString(ListSerializer(String.serializer()), membersService.get().getBody()) - member
 
-    val join = handle {
-        console.log("join")
-        session.send(ChatMessage("", it.member, MessageType.JOINING).toJson())
+    val join = handle { chat ->
+        val room = chat.room.ifBlank { randomId() }
+        val member = chat.member.ifBlank { "someOne ${randomId()}" }
+        membersService = http("/members/$room")
+        session = websocket("ws://${window.location.host}/chat/$room").connect().also {
+            it.messages.body.map { msg -> ChatMessage.fromJson(msg) } handledBy receive
+            it.send(ChatMessage("", member, MessageType.JOINING).toJson())
+        }
+        delay(200)
         syncBy(scrollDown)
-        it.copy(members = loadUsers(it.member), messages = emptyList())
+        Chat(room, member, loadUsers(chat.member), emptyList(), true).also { console.log(it) }
     }
 
     private val receive = handle<ChatMessage> { chat, msg ->
@@ -46,16 +48,12 @@ object ChatStore : RootStore<Chat>(Chat(router.current["room"].orEmpty(), router
         )
     }
 
-    val send = handle<ChatMessage> { chat, msg ->
-        console.log("send $msg")
-        session.send(msg.toJson())
-        val msgs = chat.messages + msg
-        console.log("+++ $msgs")
-        chat.copy(messages = msgs)
+    val send = handle<String> { chat, msg ->
+        chat.copy(messages = chat.messages + ChatMessage(msg, chat.member).also { session.send(it.toJson()) })
     }
 
+    //FIXME: why not in receive
     private val scrollDown = handle { msgs ->
-        console.log("scroll")
         document.getElementById("chat-messages")?.let {
             it.scrollTo(0.0, it.scrollHeight.toDouble())
         }
@@ -69,8 +67,10 @@ object ChatStore : RootStore<Chat>(Chat(router.current["room"].orEmpty(), router
         it
     }
 
+    val inRoom = data.map { it.inRoom }.distinctUntilChanged()
+
     init {
-        if (current.inRoom()) join()
+        if (current.readyToJoin()) join()
     }
 
 }

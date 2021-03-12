@@ -45,7 +45,24 @@ data class Chat(
     val room: String = "",
     val member: String = "",
     val members: List<String> = emptyList(),
-    val messages: List<ChatMessage> = emptyList()
+    val messages: List<ChatMessage> = emptyList(),
+    val inRoom: Boolean = false
 ) {
-    fun inRoom(): Boolean = room.isNotBlank() && member.isNotBlank()
+    fun readyToJoin() = room.isNotBlank() && member.isNotBlank()
 }
+
+//        override val validator = object : ComponentValidator<String, Unit>() {
+//            override fun validate(data: String, metadata: Unit): List<ComponentValidationMessage> {
+//                val name = inspect(data)
+//                return when {
+//                    name.data.isBlank() ->
+//                        listOf(errorMessage(name.id, "Please enter your name."))
+//                    name.data.trim().length > 25 ->
+//                        listOf(errorMessage(name.id, "Please use a shorter name."))
+//                    name.data.trim().length <= 3 ->
+//                        listOf(errorMessage(name.id, "Please use a longer name."))
+//                    else -> emptyList()
+//                }
+//            }
+//        }
+
