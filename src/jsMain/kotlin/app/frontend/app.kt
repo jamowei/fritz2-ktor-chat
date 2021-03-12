@@ -1,5 +1,6 @@
 package app.frontend
 
+import app.frontend.views.chatPage
 import app.frontend.views.joinPage
 import app.shared.ChatMessage
 import app.shared.L
@@ -33,16 +34,20 @@ fun main() {
             }
 
             header {
-                (::span.styled {
-                    fontWeight { semiBold }
-                    fontSize { large }
-                }) { +"Where you are"}
+                ChatStore.data.render { chat ->
+                    (::span.styled {
+                        fontWeight { semiBold }
+                        fontSize { large }
+                    }) { +(if(chat.inRoom()) "${chat.member} @ ${chat.room}" else "Welcome!") }
+                }
             }
 
             nav {
-                navSection("Members")
                 ChatStore.data.render { chat  ->
-                    if (chat.inRoom()) members(ChatStore.sub(L.Chat.members))
+                    if (chat.inRoom()) {
+                        navSection("Members")
+                        members(ChatStore.sub(L.Chat.members))
+                    }
                 }
             }
 
@@ -54,19 +59,8 @@ fun main() {
 
             main {
                 ChatStore.data.render { chat  ->
-                    if (chat.inRoom()) {
-                        ul {
-                            ChatStore.sub(L.Chat.messages).data.render {
-                                it.forEach {
-                                    li { +it.content }
-                                }
-                            }
-                        }
-                    }
-                    else if (chat.room.isNotBlank())
-                        joinPage(chat.room)
-                    else
-                        joinPage()
+                    if (chat.inRoom()) chatPage()
+                    else joinPage()
                 }
             }
 

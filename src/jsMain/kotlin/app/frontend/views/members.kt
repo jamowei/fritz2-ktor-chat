@@ -20,22 +20,21 @@ fun RenderContext.avatar(name: String) {
 }
 
 fun RenderContext.member(name: String): Div =
-    lineUp {
+    lineUp({
+        alignItems { center }
+    }) {
         spacing { small }
         items {
             avatar(name)
-            (::div.styled {
-                margins { top { tiny } }
-            }) {
+            div {
                 (::div.styled {
-                    fontSize { normal }
-                    color { "white" }
+                    color { base }
                     fontWeight { semiBold }
+                    lineHeight { small }
                 }) { +name }
                 (::div.styled {
-                    margins { top { "-0.25rem" } }
                     fontSize { small }
-                    color { "#92959e" }
+                    color { lightGray }
                 }) {
                     icon({
                         size { small }
@@ -50,7 +49,7 @@ fun RenderContext.member(name: String): Div =
 
 fun RenderContext.members(store: Store<List<String>>) {
     stackUp({
-        padding { normal }
+        padding { small }
     }) {
         items {
             store.data.renderEach { name ->

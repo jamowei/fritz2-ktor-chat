@@ -1,6 +1,5 @@
 package app.frontend
 
-import app.frontend.views.copyToClipboard
 import app.shared.Chat
 import app.shared.ChatMessage
 import app.shared.MessageType
