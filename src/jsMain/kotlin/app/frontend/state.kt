@@ -11,14 +11,12 @@ import dev.fritz2.routing.router
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 
-val defaultRoute = mapOf<String, String>()
-val router = router(defaultRoute)
+val router = router(emptyMap())
 
 object ChatStore : RootStore<Chat>(Chat(router.current["room"].orEmpty(), router.current["member"].orEmpty())) {
     private lateinit var membersService: Request
@@ -30,6 +28,7 @@ object ChatStore : RootStore<Chat>(Chat(router.current["room"].orEmpty(), router
     val join = handle { chat ->
         val room = chat.room.ifBlank { randomId() }
         val member = chat.member.ifBlank { "someOne ${randomId()}" }
+        console.log("joining room $room with member $member")
         membersService = http("/members/$room")
         session = websocket("ws://${window.location.host}/chat/$room").connect().also {
             it.messages.body.map { msg -> ChatMessage.fromJson(msg) } handledBy receive
@@ -37,7 +36,7 @@ object ChatStore : RootStore<Chat>(Chat(router.current["room"].orEmpty(), router
         }
         delay(200)
         syncBy(scrollDown)
-        Chat(room, member, loadUsers(chat.member), emptyList(), true)
+        Chat(room, member, loadUsers(member), emptyList(), true)
     }
 
     private val receive = handle<ChatMessage> { chat, msg ->
@@ -67,7 +66,7 @@ object ChatStore : RootStore<Chat>(Chat(router.current["room"].orEmpty(), router
         it
     }
 
-    val inRoom = data.map { it.joined }.distinctUntilChanged()
+    val joined = data.map { it.joined }//.distinctUntilChanged()
 
     init {
         if (current.readyToJoin()) join()

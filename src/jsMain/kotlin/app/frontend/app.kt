@@ -12,11 +12,10 @@ import dev.fritz2.dom.values
 import dev.fritz2.styling.params.styled
 import dev.fritz2.styling.theme.DefaultTheme
 import dev.fritz2.styling.theme.render
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import navSection
 
-@ExperimentalCoroutinesApi
 fun main() {
     val roomStore = ChatStore.sub(L.Chat.room)
     val memberStore = ChatStore.sub(L.Chat.member)
@@ -49,7 +48,7 @@ fun main() {
             }
 
             nav {
-                ChatStore.inRoom.render {
+                ChatStore.joined.render {
                     if (it) {
                         navSection("Members")
                         members(ChatStore.sub(L.Chat.members))
@@ -64,17 +63,19 @@ fun main() {
             }
 
             main {
-                ChatStore.inRoom.render {
+                ChatStore.joined.render {
                     if (it) chatPage() else joinPage(roomStore, memberStore)
                 }
             }
 
             tabs {
-                ChatStore.inRoom.render {
+                ChatStore.joined.render {
                     if (it) {
                         inputField {
                             events {
-                                changes.values() handledBy ChatStore.send
+                                changes.values().map { value ->
+                                    domNode.value = ""; value // resetting the value after sending
+                                } handledBy ChatStore.send
                             }
                         }
                     }

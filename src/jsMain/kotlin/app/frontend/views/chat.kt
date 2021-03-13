@@ -8,7 +8,6 @@ import dev.fritz2.components.lineUp
 import dev.fritz2.components.stackUp
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.styling.params.styled
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 
 fun RenderContext.sentFrom(member: String) {
@@ -35,7 +34,6 @@ fun RenderContext.sentAt(time: String) {
     }
 }
 
-@ExperimentalCoroutinesApi
 fun RenderContext.chatMessage(msg: ChatMessage, self: Boolean) {
     lineUp({
         margins { bottom { tiny } }
@@ -47,7 +45,7 @@ fun RenderContext.chatMessage(msg: ChatMessage, self: Boolean) {
         spacing { smaller }
         items {
             sentFrom(msg.member)
-            sentAt(msg.created.print())
+            sentAt(msg.created)
         }
     }
     (::div.styled {
@@ -61,7 +59,6 @@ fun RenderContext.chatMessage(msg: ChatMessage, self: Boolean) {
     }
 }
 
-@ExperimentalCoroutinesApi
 fun RenderContext.chatPage() {
     stackUp({
         alignItems { stretch }

@@ -1,9 +1,6 @@
 package app.frontend
 
 import kotlinx.browser.document
-import kotlinx.datetime.Instant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import org.w3c.dom.HTMLTextAreaElement
 
 fun copyToClipboard(text: String) {
@@ -21,7 +18,3 @@ fun copyToClipboard(text: String) {
         }
     }
 }
-
-fun Instant.print(): String =
-    this.toLocalDateTime(TimeZone.currentSystemDefault())
-        .let { "${it.hour}:${it.minute}" }

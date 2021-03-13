@@ -1,6 +1,7 @@
 package app.shared
 
 import dev.fritz2.lenses.Lenses
+import kotlinx.datetime.Clock
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
@@ -10,7 +11,7 @@ data class ChatMessage(
     val content: String,
     val member: String,
     val type: MessageType = MessageType.MESSAGE,
-    val created: String = "just now"
+    val created: String = currentAsString()
 ) {
     companion object {
         fun fromJson(source: String): ChatMessage =
@@ -35,6 +36,10 @@ data class Chat(
 ) {
     fun readyToJoin() = room.isNotBlank() && member.isNotBlank()
 }
+
+// returning current time in "HH:mm" format
+fun currentAsString(): String =
+    Clock.System.now().toString().substringAfter('T').dropLast(8)
 
 //        override val validator = object : ComponentValidator<String, Unit>() {
 //            override fun validate(data: String, metadata: Unit): List<ComponentValidationMessage> {

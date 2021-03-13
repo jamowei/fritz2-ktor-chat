@@ -5,10 +5,8 @@ import dev.fritz2.binding.Store
 import dev.fritz2.components.*
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.styling.params.styled
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.map
 
-@ExperimentalCoroutinesApi
 fun RenderContext.joinPage(roomStore: Store<String>, memberStore: Store<String>) {
 
     stackUp({
