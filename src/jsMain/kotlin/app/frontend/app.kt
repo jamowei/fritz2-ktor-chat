@@ -5,23 +5,20 @@ import app.frontend.views.joinPage
 import app.frontend.views.member
 import app.frontend.views.members
 import app.shared.L
-import dev.fritz2.components.appFrame
-import dev.fritz2.components.icon
-import dev.fritz2.components.inputField
+import dev.fritz2.components.*
 import dev.fritz2.dom.values
 import dev.fritz2.styling.params.styled
-import dev.fritz2.styling.theme.DefaultTheme
 import dev.fritz2.styling.theme.render
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import navSection
+import org.w3c.dom.HTMLInputElement
 
 fun main() {
     val roomStore = ChatStore.sub(L.Chat.room)
     val memberStore = ChatStore.sub(L.Chat.member)
 
-
-    render(DefaultTheme()) {
+    render(ChatTheme) {
         appFrame {
             brand {
                 icon({
@@ -56,6 +53,17 @@ fun main() {
                 }
             }
 
+            actions {
+                ChatStore.joined.render {
+                    if (it) {
+                        clickButton {
+                            icon { fromTheme { share } }
+                            variant { link }
+                        } handledBy ChatStore.invite
+                    }
+                }
+            }
+
             footer {
                 ChatStore.joined.render {
                     if (it) {
@@ -75,12 +83,25 @@ fun main() {
             tabs {
                 ChatStore.joined.render {
                     if (it) {
-                        inputField {
-                            events {
-                                changes.values().map { value ->
-                                    domNode.value = "" // resetting the value after sending
-                                    value
-                                } handledBy ChatStore.send
+                        lineUp({
+                            width { full }
+                        }) {
+                            spacing { none }
+                            items {
+                                lateinit var inputFieldDomNode: HTMLInputElement
+                                inputField {
+                                    events {
+                                        inputFieldDomNode = domNode
+                                        changes.values().map { value ->
+                                            domNode.value = "" // resetting the value after sending
+                                            value
+                                        } handledBy ChatStore.send
+                                    }
+                                }
+                                clickButton {
+                                    icon { fromTheme { send } }
+                                    variant { ghost }
+                                }.map { inputFieldDomNode.value } handledBy ChatStore.send
                             }
                         }
                     }
