@@ -57,8 +57,12 @@ fun main() {
             }
 
             footer {
-                memberStore.data.render { member ->
-                    if (member.isNotBlank()) member(member)
+                ChatStore.joined.render {
+                    if (it) {
+                        memberStore.data.render { member ->
+                            if (member.isNotBlank()) member(member)
+                        }
+                    }
                 }
             }
 
@@ -74,7 +78,8 @@ fun main() {
                         inputField {
                             events {
                                 changes.values().map { value ->
-                                    domNode.value = ""; value // resetting the value after sending
+                                    domNode.value = "" // resetting the value after sending
+                                    value
                                 } handledBy ChatStore.send
                             }
                         }
