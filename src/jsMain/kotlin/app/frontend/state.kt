@@ -37,7 +37,7 @@ object ChatStore : RootStore<Chat>(Chat(router.current["room"].orEmpty(), router
         }
         delay(200)
         syncBy(scrollDown)
-        Chat(room, member, loadUsers(chat.member), emptyList(), true).also { console.log(it) }
+        Chat(room, member, loadUsers(chat.member), emptyList(), true)
     }
 
     private val receive = handle<ChatMessage> { chat, msg ->
@@ -67,11 +67,10 @@ object ChatStore : RootStore<Chat>(Chat(router.current["room"].orEmpty(), router
         it
     }
 
-    val inRoom = data.map { it.inRoom }.distinctUntilChanged()
+    val inRoom = data.map { it.joined }.distinctUntilChanged()
 
     init {
         if (current.readyToJoin()) join()
     }
-
 }
 

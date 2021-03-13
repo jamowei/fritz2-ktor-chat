@@ -1,7 +1,6 @@
 package app.frontend.views
 
 import app.frontend.ChatStore
-import app.frontend.print
 import app.shared.ChatMessage
 import app.shared.L
 import dev.fritz2.components.icon
@@ -39,9 +38,10 @@ fun RenderContext.sentAt(time: String) {
 @ExperimentalCoroutinesApi
 fun RenderContext.chatMessage(msg: ChatMessage, self: Boolean) {
     lineUp({
-        margins { bottom { small } }
+        margins { bottom { tiny } }
         textAlign { if (self) right else left }
         fontSize { smaller }
+        alignItems { flexEnd }
     }) {
         reversed(self)
         spacing { smaller }
