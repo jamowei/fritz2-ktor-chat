@@ -10,7 +10,9 @@ import dev.fritz2.dom.values
 import dev.fritz2.styling.params.styled
 import dev.fritz2.styling.theme.render
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import navSection
 import org.w3c.dom.HTMLInputElement
 
@@ -65,13 +67,12 @@ fun main() {
             }
 
             footer {
-                ChatStore.joined.render {
-                    if (it) {
-                        memberStore.data.render { member ->
-                            if (member.isNotBlank()) member(member)
-                        }
+                ChatStore.joined.flatMapLatest { joined ->
+                    memberStore.data.mapNotNull { member ->
+                        if (joined && member.isNotBlank()) member
+                        else null
                     }
-                }
+                }.render { member(it) }
             }
 
             main {
