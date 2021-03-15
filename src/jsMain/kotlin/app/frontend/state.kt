@@ -11,6 +11,7 @@ import dev.fritz2.routing.router
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
@@ -48,7 +49,9 @@ object ChatStore : RootStore<Chat>(Chat(router.current["room"].orEmpty(), router
     }
 
     val send = handle<String> { chat, msg ->
-        chat.copy(messages = chat.messages + ChatMessage(msg, chat.member).also { session.send(it.toJson()) })
+        chat.copy(messages = chat.messages + ChatMessage(msg, chat.member)
+            .also { session.send(it.toJson()) }
+        )
     }
 
     //FIXME: why not in receive
@@ -66,7 +69,7 @@ object ChatStore : RootStore<Chat>(Chat(router.current["room"].orEmpty(), router
         it
     }
 
-    val joined = data.map { it.joined }
+    val joined = data.map { it.joined }.distinctUntilChanged()
 
     init {
         if (current.readyToJoin()) join()
