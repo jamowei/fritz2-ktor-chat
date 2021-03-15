@@ -5,6 +5,7 @@ import app.shared.ChatMessage
 import app.shared.MessageType
 import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.invoke
+import dev.fritz2.components.ToastComponent
 import dev.fritz2.components.randomId
 import dev.fritz2.remote.*
 import dev.fritz2.routing.router
@@ -49,12 +50,12 @@ object ChatStore : RootStore<Chat>(Chat(router.current["room"].orEmpty(), router
     }
 
     val send = handle<String> { chat, msg ->
-        chat.copy(messages = chat.messages + ChatMessage(msg, chat.member)
-            .also { session.send(it.toJson()) }
-        )
+        if (msg.isNotBlank()) {
+            chat.copy(messages = chat.messages + ChatMessage(msg, chat.member).also { session.send(it.toJson()) })
+        }
+        else chat
     }
 
-    //FIXME: why not in receive
     private val scrollDown = handle { msgs ->
         document.getElementById("chat-messages")?.let {
             it.scrollTo(0.0, it.scrollHeight.toDouble())
