@@ -24,7 +24,7 @@ fun main() {
         appFrame {
             brand {
                 icon({
-                    color { gray200 }
+                    color { tertiary.baseContrast }
                     size { "2rem" }
                     margins { right { normal } }
                 }) { fromTheme { fritz2 } }

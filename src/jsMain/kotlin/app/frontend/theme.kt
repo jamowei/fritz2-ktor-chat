@@ -10,10 +10,32 @@ object ChatTheme : DefaultTheme() {
 
     override val appFrame: AppFrameStyles = object : AppFrameStyles by super.appFrame {
 
+        override val brand: Style<FlexParams> = {
+            background { color { tertiary.base } }
+            paddings {
+                all { small }
+                left { normal }
+            }
+            color { tertiary.baseContrast }
+            alignItems { center }
+            borders {
+                bottom {
+                    width { "1px " }
+                    color { gray400 }
+                }
+            }
+        }
+
+        override val sidebar: Style<BasicParams> = {
+            background { color { tertiary.base } }
+            color { tertiary.baseContrast }
+            minWidth { "25vw" }
+        }
+
         override val main: Style<BasicParams> = {
             padding { none }
             background { color { gray50 } }
-            color { "rgb(44, 49, 54)" }
+            color { gray700 }
         }
 
         override val tabs: Style<FlexParams> = {

@@ -5,6 +5,8 @@ import app.shared.ChatMessage
 import app.shared.ChatValidator
 import app.shared.MessageType
 import dev.fritz2.binding.RootStore
+import dev.fritz2.components.alert
+import dev.fritz2.components.showToast
 import dev.fritz2.components.validation.ComponentValidator
 import dev.fritz2.components.validation.WithValidator
 import dev.fritz2.remote.*
@@ -68,6 +70,13 @@ object ChatStore : RootStore<Chat>(Chat(router.current["room"].orEmpty(), router
         copyToClipboard(
             "${window.location.protocol}//${window.location.host}/#room=${encodeURIComponent(it.room)}"
         )
+        showToast {
+            content {
+                alert {
+                    content("Invitation-URL copied to your clipboard")
+                }
+            }
+        }
         it
     }
 
