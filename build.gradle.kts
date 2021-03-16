@@ -1,14 +1,14 @@
 plugins {
     application
-    id("dev.fritz2.fritz2-gradle") version "0.8"
-    kotlin("plugin.serialization") version "1.4.10"
+    id("dev.fritz2.fritz2-gradle") version "0.9.1"
+    kotlin("multiplatform") version "1.4.30"
+    kotlin("plugin.serialization") version "1.4.30"
 }
 
 group = "dev.fritz2"
 version = "1.0"
 
 repositories {
-    jcenter()
     mavenCentral()
     maven("https://oss.jfrog.org/artifactory/jfrog-dependencies")
     maven("https://dl.bintray.com/kotlin/kotlin-js-wrappers")
@@ -29,28 +29,38 @@ kotlin {
             useJUnit()
         }
     }
-    js {
+    js(IR) {
         browser {
             runTask {
-                devServer = org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig.DevServer(
+                devServer = devServer?.copy(
                     port = 9000,
-                    contentBase = listOf("$buildDir/distributions"),
                     proxy = mapOf(
-                        "/members" to "http://localhost:8080"
+                        "/members" to "http://localhost:8080",
+                        "/chat" to mapOf(
+                            "target" to "ws://localhost:8080",
+                            "ws" to true
+                        )
                     )
                 )
             }
         }
-    }
+    }.binaries.executable()
+
     sourceSets {
         val ktorVersion = "1.4.2"
         val logbackVersion = "1.2.3"
         val serializationVersion = "1.0.1"
         val dateTimeVersion = "0.1.1"
 
+        all {
+            languageSettings.apply {
+                useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
+            }
+        }
+
         val commonMain by getting {
             dependencies {
-                implementation("dev.fritz2:components:0.9-SNAPSHOT")
+                implementation("dev.fritz2:components:0.9.1")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:$dateTimeVersion")
             }

@@ -1,15 +1,12 @@
 package app.shared
 
+import dev.fritz2.components.validation.ComponentValidationMessage
+import dev.fritz2.components.validation.ComponentValidator
+import dev.fritz2.components.validation.errorMessage
+import dev.fritz2.identification.inspect
 import dev.fritz2.lenses.Lenses
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
 
 @Lenses
@@ -18,8 +15,7 @@ data class ChatMessage(
     val content: String,
     val member: String,
     val type: MessageType = MessageType.MESSAGE,
-    @Serializable(with = InstantSerializer::class)
-    val created: Instant = Clock.System.now()
+    val created: String = currentAsString()
 ) {
     companion object {
         fun fromJson(source: String): ChatMessage =
@@ -34,8 +30,32 @@ enum class MessageType {
     MESSAGE, JOINING, LEAVING
 }
 
-object InstantSerializer : KSerializer<Instant> {
-    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Instant", PrimitiveKind.STRING)
-    override fun serialize(encoder: Encoder, value: Instant) = encoder.encodeString(value.toString())
-    override fun deserialize(decoder: Decoder): Instant = Instant.parse(decoder.decodeString())
+@Lenses
+data class Chat(
+    val room: String = "",
+    val member: String = "",
+    val members: List<String> = emptyList(),
+    val messages: List<ChatMessage> = emptyList(),
+    val joined: Boolean = false
+) {
+    fun readyToJoin() = room.isNotBlank() && member.isNotBlank()
 }
+
+// returning current time in "HH:mm" format
+fun currentAsString(): String =
+    Clock.System.now().toString().substringAfter('T').dropLast(8)
+
+object ChatValidator : ComponentValidator<Chat, Unit>() {
+    @ExperimentalStdlibApi
+    override fun validate(data: Chat, metadata: Unit): List<ComponentValidationMessage> {
+        val member = inspect(data).sub(L.Chat.member)
+        val room = inspect(data).sub(L.Chat.room)
+
+        return buildList {
+            if (member.data.isBlank()) add(errorMessage(member.id, "Sorry, you have to enter a name"))
+            else if (member.data.trim().length > 25) add(errorMessage(member.id, "Please use a shorter name."))
+            if (room.data.isBlank()) add(errorMessage(room.id, "You have to enter the title of your chat"))
+        }
+    }
+}
+
