@@ -36,8 +36,7 @@ fun RenderContext.joinPage(roomStore: Store<String>, memberStore: Store<String>)
                 }
             }
 
-            clickButton({
-            }) {
+            clickButton {
                 text("Join room")
                 icon { fromTheme { message } }
             } handledBy ChatStore.join
