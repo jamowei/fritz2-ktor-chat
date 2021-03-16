@@ -49,5 +49,15 @@ fun RenderContext.fritzLinks() {
     navLink {
         text("Examples")
     }.map { "https://fritz2.dev/examples.html" } handledBy ChatStore.jumpTo
+}
 
+fun registerServiceWorker() {
+    try {
+        window.addEventListener("load", {
+            window.navigator.serviceWorker.register("/serviceWorker.js")
+        })
+        console.log("ServiceWorker registered")
+    } catch (t: Throwable) {
+        console.log("Error registering ServiceWorker:", t)
+    }
 }

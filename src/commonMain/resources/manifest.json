@@ -1,0 +1,21 @@
+{
+  "short_name": "Chat",
+  "name": "fritz2 Chat App",
+  "icons": [
+    {
+      "src": "/img/fritz2_192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/img/fritz2_512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#f9faf9",
+  "display": "fullscreen",
+  "theme_color": "",
+  "description": "fritz2 chat app"
+}

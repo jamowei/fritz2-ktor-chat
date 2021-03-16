@@ -6,19 +6,17 @@ import app.frontend.views.member
 import app.frontend.views.members
 import app.shared.L
 import dev.fritz2.components.*
-import dev.fritz2.dom.html.Keys
-import dev.fritz2.dom.key
 import dev.fritz2.dom.values
 import dev.fritz2.styling.params.styled
 import dev.fritz2.styling.theme.render
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import navSection
 import org.w3c.dom.HTMLInputElement
 
 fun main() {
+    registerServiceWorker()
+
     val roomStore = ChatStore.sub(L.Chat.room)
     val memberStore = ChatStore.sub(L.Chat.member)
 
@@ -26,7 +24,7 @@ fun main() {
         appFrame {
             brand {
                 icon({
-                    color { lighterGray }
+                    color { gray200 }
                     size { "2rem" }
                     margins { right { normal } }
                 }) { fromTheme { fritz2 } }

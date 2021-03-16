@@ -12,7 +12,7 @@ import dev.fritz2.styling.params.styled
 fun RenderContext.avatar(name: String) {
     (::img.styled {
         radius { "50%" }
-        background { color { "#5eb97a" } }
+        background { color { primary.highlight } }
         padding { "3px" }
     }) {
         src("http://www.avatarpro.biz/avatar/${name.hashCode()})?s=55")
@@ -29,13 +29,13 @@ fun RenderContext.member(name: String): Div =
             avatar(name)
             div {
                 box({
-                    color { base }
+                    color { gray50 }
                     fontWeight { semiBold }
                     lineHeight { small }
                 }) { +name }
                 box({
                     fontSize { small }
-                    color { lightGray }
+                    color { primary.highlight }
                 }) {
                     icon({
                         size { small }

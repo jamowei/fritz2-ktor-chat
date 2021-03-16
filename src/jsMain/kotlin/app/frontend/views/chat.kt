@@ -25,7 +25,7 @@ fun RenderContext.sentFrom(member: String) {
 
 fun RenderContext.sentAt(time: String) {
     (::span.styled {
-        color { darkerGray }
+        color { gray500 }
     }) {
         icon({
             size { small }
@@ -51,7 +51,7 @@ fun RenderContext.chatMessage(msg: ChatMessage, self: Boolean) {
     }
     box({
         boxShadow { flat }
-        background { color { if (self) primary else secondary } }
+        background { color { if (self) primary.base else secondary.base } }
         color { "white" }
         padding { small }
         radius { normal }

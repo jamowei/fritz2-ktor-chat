@@ -1,6 +1,6 @@
 plugins {
     application
-    id("dev.fritz2.fritz2-gradle") version "0.9"
+    id("dev.fritz2.fritz2-gradle") version "0.9.1"
     kotlin("multiplatform") version "1.4.30"
     kotlin("plugin.serialization") version "1.4.30"
 }
@@ -60,7 +60,7 @@ kotlin {
 
         val commonMain by getting {
             dependencies {
-                implementation("dev.fritz2:components:0.9")
+                implementation("dev.fritz2:components:0.9.1")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:$dateTimeVersion")
             }
