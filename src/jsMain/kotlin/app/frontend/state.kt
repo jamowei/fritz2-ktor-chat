@@ -2,11 +2,14 @@ package app.frontend
 
 import app.shared.Chat
 import app.shared.ChatMessage
+import app.shared.ChatValidator
 import app.shared.MessageType
 import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.invoke
 import dev.fritz2.components.ToastComponent
 import dev.fritz2.components.randomId
+import dev.fritz2.components.validation.ComponentValidator
+import dev.fritz2.components.validation.WithValidator
 import dev.fritz2.remote.*
 import dev.fritz2.routing.router
 import kotlinx.browser.document
@@ -20,9 +23,11 @@ import kotlinx.serialization.json.Json
 
 val router = router(emptyMap())
 
-object ChatStore : RootStore<Chat>(Chat(router.current["room"].orEmpty(), router.current["member"].orEmpty())) {
+object ChatStore : RootStore<Chat>(Chat(router.current["room"].orEmpty(), router.current["member"].orEmpty())), WithValidator<Chat, Unit> {
     private lateinit var membersService: Request
     private lateinit var session: Session
+
+    override val validator: ComponentValidator<Chat, Unit> = ChatValidator
 
     private suspend fun loadUsers(member: String): List<String> =
         Json.decodeFromString(ListSerializer(String.serializer()), membersService.get().getBody()) - member

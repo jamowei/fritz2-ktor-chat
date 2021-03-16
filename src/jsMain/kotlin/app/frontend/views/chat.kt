@@ -7,6 +7,7 @@ import dev.fritz2.components.icon
 import dev.fritz2.components.lineUp
 import dev.fritz2.components.stackUp
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.styling.params.BackgroundRepeats
 import dev.fritz2.styling.params.styled
 
 
@@ -24,7 +25,7 @@ fun RenderContext.sentFrom(member: String) {
 
 fun RenderContext.sentAt(time: String) {
     (::span.styled {
-        color { gray }
+        color { darkerGray }
     }) {
         icon({
             size { small }
@@ -62,6 +63,12 @@ fun RenderContext.chatMessage(msg: ChatMessage, self: Boolean) {
 fun RenderContext.chatPage() {
     stackUp({
         alignItems { stretch }
+        height { full }
+        background {
+            image { "/img/y-so-serious-white.png" }
+            repeat { repeat }
+        }
+        padding { normal }
     }) {
         items {
             ChatStore.sub(L.Chat.messages).data.renderEach { msg ->

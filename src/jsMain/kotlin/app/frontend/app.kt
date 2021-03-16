@@ -12,6 +12,7 @@ import dev.fritz2.dom.values
 import dev.fritz2.styling.params.styled
 import dev.fritz2.styling.theme.render
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import navSection
@@ -40,18 +41,21 @@ fun main() {
                     fontWeight { semiBold }
                     fontSize { large }
                 }) {
-                    roomStore.data.combine(memberStore.data) { room, member ->
-                        if (room.isBlank()) "Welcome!"
-                        else "$member @ $room"
+                    ChatStore.joined.map {
+                        if (!it) "Join a room!"
+                        else "${memberStore.current} @ ${roomStore.current}"
                     }.asText()
                 }
             }
 
             nav {
-                ChatStore.joined.render {
+                ChatStore.data.map { it.members.isNotEmpty() }.distinctUntilChanged().render {
                     if (it) {
                         navSection("Members")
                         members(ChatStore.sub(L.Chat.members))
+                    }
+                    else {
+                        fritzLinks()
                     }
                 }
             }
@@ -104,9 +108,12 @@ fun main() {
                                     }
                                 }
                                 clickButton {
-                                    icon { fromTheme { send } }
-                                    variant { ghost }
-                                }.map { inputFieldDomNode.value } handledBy ChatStore.send
+                                    icon { fromTheme { play } }
+                                    variant { link }
+                                }.map {
+                                    inputFieldDomNode.focus()
+                                    inputFieldDomNode.value
+                                } handledBy ChatStore.send
                             }
                         }
                     }

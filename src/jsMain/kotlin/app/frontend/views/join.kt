@@ -17,36 +17,27 @@ fun RenderContext.joinPage(roomStore: Store<String>, memberStore: Store<String>)
         spacing { large }
         items {
 
-            lineUp({
-                width { full }
-                padding { huge }
-                background { color { lightestGray } }
-                boxShadow { flat }
-                radius { normal }
-                alignItems { center }
+            (::img.styled {
+                width(sm = { full }, lg = { "50%" } )
             }) {
-                items {
-                    icon({ size { giant } }) { fromTheme { fritz2 } }
-                    (::span.styled {
-                        fontWeight { bold }
-                        fontSize { large }
-                    }) {
-                        roomStore.data.map {
-                            if (it.isNotBlank()) "Join chat room $it" else "Create a chat room"
-                        }.asText()
-                    }
+                src("img/undraw_Status_update_re_dm9y.svg")
+            }
+
+            formControl {
+                inputField(id = "name", store = roomStore) {
+                    placeholder("Enter a title for your chat")
                 }
             }
 
             formControl {
                 inputField(id = "name", store = memberStore) {
-                    placeholder("Enter your chat name")
+                    placeholder("Enter your name")
                 }
             }
 
             clickButton({
             }) {
-                text(roomStore.data.map { if (it.isNotBlank()) "Join" else "Create" })
+                text("Join room")
                 icon { fromTheme { message } }
             } handledBy ChatStore.join
         }

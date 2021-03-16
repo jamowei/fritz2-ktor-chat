@@ -1,5 +1,9 @@
 package app.shared
 
+import dev.fritz2.components.validation.ComponentValidationMessage
+import dev.fritz2.components.validation.ComponentValidator
+import dev.fritz2.components.validation.errorMessage
+import dev.fritz2.identification.inspect
 import dev.fritz2.lenses.Lenses
 import kotlinx.datetime.Clock
 import kotlinx.serialization.Serializable
@@ -41,18 +45,22 @@ data class Chat(
 fun currentAsString(): String =
     Clock.System.now().toString().substringAfter('T').dropLast(8)
 
-//        override val validator = object : ComponentValidator<String, Unit>() {
-//            override fun validate(data: String, metadata: Unit): List<ComponentValidationMessage> {
-//                val name = inspect(data)
-//                return when {
-//                    name.data.isBlank() ->
-//                        listOf(errorMessage(name.id, "Please enter your name."))
-//                    name.data.trim().length > 25 ->
-//                        listOf(errorMessage(name.id, "Please use a shorter name."))
-//                    name.data.trim().length <= 3 ->
-//                        listOf(errorMessage(name.id, "Please use a longer name."))
-//                    else -> emptyList()
-//                }
-//            }
-//        }
+object ChatValidator : ComponentValidator<Chat, Unit>() {
+    @ExperimentalStdlibApi
+    override fun validate(data: Chat, metadata: Unit): List<ComponentValidationMessage> {
+        val member = inspect(data).sub(L.Chat.member)
+        val room = inspect(data).sub(L.Chat.room)
+
+        return buildList {
+            when {
+                member.data.isBlank() ->
+                    add(errorMessage(member.id, "Sorry, you have to enter a name"))
+                member.data.trim().length > 25 ->
+                    add(errorMessage(member.id, "Please use a shorter name."))
+                room.data.isBlank() ->
+                    add(errorMessage(member.id, "You have to enter a title for your chat"))
+            }
+        }
+    }
+}
 
