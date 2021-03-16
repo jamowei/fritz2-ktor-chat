@@ -83,7 +83,7 @@ object ChatStore : RootStore<Chat>(Chat(router.current["room"].orEmpty(), router
     val joined = data.map { it.joined }.distinctUntilChanged()
 
     init {
-        if (current.readyToJoin()) join()
+        if (current.readyToJoin) join()
     }
 }
 

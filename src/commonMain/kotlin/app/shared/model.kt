@@ -38,7 +38,8 @@ data class Chat(
     val messages: List<ChatMessage> = emptyList(),
     val joined: Boolean = false
 ) {
-    fun readyToJoin() = room.isNotBlank() && member.isNotBlank()
+    val readyToJoin
+        get() = room.isNotBlank() && member.isNotBlank()
 }
 
 // returning current time in "HH:mm" format
