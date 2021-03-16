@@ -52,14 +52,9 @@ object ChatValidator : ComponentValidator<Chat, Unit>() {
         val room = inspect(data).sub(L.Chat.room)
 
         return buildList {
-            when {
-                member.data.isBlank() ->
-                    add(errorMessage(member.id, "Sorry, you have to enter a name"))
-                member.data.trim().length > 25 ->
-                    add(errorMessage(member.id, "Please use a shorter name."))
-                room.data.isBlank() ->
-                    add(errorMessage(member.id, "You have to enter a title for your chat"))
-            }
+            if (member.data.isBlank()) add(errorMessage(member.id, "Sorry, you have to enter a name"))
+            else if (member.data.trim().length > 25) add(errorMessage(member.id, "Please use a shorter name."))
+            if (room.data.isBlank()) add(errorMessage(room.id, "You have to enter the title of your chat"))
         }
     }
 }

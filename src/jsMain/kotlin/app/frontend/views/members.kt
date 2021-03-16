@@ -1,6 +1,7 @@
 package app.frontend.views
 
 import dev.fritz2.binding.Store
+import dev.fritz2.components.box
 import dev.fritz2.components.icon
 import dev.fritz2.components.lineUp
 import dev.fritz2.components.stackUp
@@ -27,12 +28,12 @@ fun RenderContext.member(name: String): Div =
         items {
             avatar(name)
             div {
-                (::div.styled {
+                box({
                     color { base }
                     fontWeight { semiBold }
                     lineHeight { small }
                 }) { +name }
-                (::div.styled {
+                box({
                     fontSize { small }
                     color { lightGray }
                 }) {

@@ -3,11 +3,11 @@ package app.frontend.views
 import app.frontend.ChatStore
 import app.shared.ChatMessage
 import app.shared.L
+import dev.fritz2.components.box
 import dev.fritz2.components.icon
 import dev.fritz2.components.lineUp
 import dev.fritz2.components.stackUp
 import dev.fritz2.dom.html.RenderContext
-import dev.fritz2.styling.params.BackgroundRepeats
 import dev.fritz2.styling.params.styled
 
 
@@ -49,7 +49,7 @@ fun RenderContext.chatMessage(msg: ChatMessage, self: Boolean) {
             sentAt(msg.created)
         }
     }
-    (::div.styled {
+    box({
         boxShadow { flat }
         background { color { if (self) primary else secondary } }
         color { "white" }
@@ -74,7 +74,7 @@ fun RenderContext.chatPage() {
             ChatStore.sub(L.Chat.messages).data.renderEach { msg ->
                 val self = msg.member == ChatStore.current.member
 
-                (::div.styled {
+                box({
                     flex { alignSelf { if (self) flexEnd else flexStart } }
                 }) {
                     chatMessage(msg, self)

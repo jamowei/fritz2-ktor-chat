@@ -6,11 +6,10 @@ import app.shared.ChatValidator
 import app.shared.MessageType
 import dev.fritz2.binding.RootStore
 import dev.fritz2.binding.invoke
-import dev.fritz2.components.ToastComponent
-import dev.fritz2.components.randomId
 import dev.fritz2.components.validation.ComponentValidator
 import dev.fritz2.components.validation.WithValidator
 import dev.fritz2.remote.*
+import dev.fritz2.routing.encodeURIComponent
 import dev.fritz2.routing.router
 import kotlinx.browser.document
 import kotlinx.browser.window
@@ -33,21 +32,19 @@ object ChatStore : RootStore<Chat>(Chat(router.current["room"].orEmpty(), router
         Json.decodeFromString(ListSerializer(String.serializer()), membersService.get().getBody()) - member
 
     val join = handle { chat ->
-        val room = chat.room.ifBlank { randomId() }
-        val member = chat.member.ifBlank { "someOne ${randomId()}" }
-        console.log("joining room $room with member $member")
-        membersService = http("/members/$room")
-        session = websocket("ws://${window.location.host}/chat/$room").connect().also {
-            it.messages.body.map { msg -> ChatMessage.fromJson(msg) } handledBy receive
-            it.send(ChatMessage("", member, MessageType.JOINING).toJson())
-        }
-        delay(200)
-        syncBy(scrollDown)
-        Chat(room, member, loadUsers(member), emptyList(), true)
+        if (validator.isValid(chat, Unit)) {
+            membersService = http("/members/${chat.room}")
+            session = websocket("ws://${window.location.host}/chat/${chat.room}").connect().also {
+                it.messages.body.map { msg -> ChatMessage.fromJson(msg) } handledBy receive
+                it.send(ChatMessage("", chat.member, MessageType.JOINING).toJson())
+            }
+            delay(200)
+            syncBy(scrollDown)
+            Chat(chat.room, chat.member, loadUsers(chat.member), emptyList(), true)
+        } else chat
     }
 
     private val receive = handle<ChatMessage> { chat, msg ->
-        console.log("receive $msg")
         chat.copy(
             members = if (msg.type == MessageType.JOINING || msg.type == MessageType.LEAVING) loadUsers(chat.member) else chat.members,
             messages = chat.messages + msg
@@ -70,7 +67,7 @@ object ChatStore : RootStore<Chat>(Chat(router.current["room"].orEmpty(), router
 
     val invite = handle {
         copyToClipboard(
-            "${window.location.protocol}//${window.location.host}/#room=${current.room}"
+            "${window.location.protocol}//${window.location.host}/#room=${encodeURIComponent(it.room)}"
         )
         it
     }

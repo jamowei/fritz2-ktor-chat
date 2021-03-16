@@ -2,10 +2,11 @@ package app.frontend.views
 
 import app.frontend.ChatStore
 import dev.fritz2.binding.Store
-import dev.fritz2.components.*
+import dev.fritz2.components.clickButton
+import dev.fritz2.components.formControl
+import dev.fritz2.components.stackUp
 import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.styling.params.styled
-import kotlinx.coroutines.flow.map
 
 fun RenderContext.joinPage(roomStore: Store<String>, memberStore: Store<String>) {
 
@@ -24,13 +25,13 @@ fun RenderContext.joinPage(roomStore: Store<String>, memberStore: Store<String>)
             }
 
             formControl {
-                inputField(id = "name", store = roomStore) {
-                    placeholder("Enter a title for your chat")
+                inputField(store = roomStore) {
+                    placeholder("Enter the title of your chat")
                 }
             }
 
             formControl {
-                inputField(id = "name", store = memberStore) {
+                inputField(store = memberStore) {
                     placeholder("Enter your name")
                 }
             }

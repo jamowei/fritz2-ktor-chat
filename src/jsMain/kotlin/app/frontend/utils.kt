@@ -1,7 +1,9 @@
 package app.frontend
 
+import dev.fritz2.binding.SimpleHandler
 import dev.fritz2.dom.html.RenderContext
 import kotlinx.browser.document
+import kotlinx.browser.window
 import navLink
 import navSection
 import org.w3c.dom.HTMLTextAreaElement
@@ -22,24 +24,30 @@ fun copyToClipboard(text: String) {
     }
 }
 
+val ChatStore.jumpTo: SimpleHandler<String>
+    get() = handle { chat, url ->
+        window.open(url, "_blank")
+        chat
+    }
+
 fun RenderContext.fritzLinks() {
     navSection("more about fritz2")
     navLink {
         text("Homepage")
-    }
+    }.map { "https://fritz2.dev" } handledBy ChatStore.jumpTo
     navLink {
         text("Documentation")
-    }
+    }.map { "https://docs.fritz2.dev" } handledBy ChatStore.jumpTo
     navLink {
         text("API")
-    }
+    }.map { "https://api.fritz2.dev" } handledBy ChatStore.jumpTo
 
     navSection("other Examples")
     navLink {
         text("Components")
-    }
+    }.map { "https://components.fritz2.dev" } handledBy ChatStore.jumpTo
     navLink {
         text("Examples")
-    }
+    }.map { "https://fritz2.dev/examples.html" } handledBy ChatStore.jumpTo
 
 }
