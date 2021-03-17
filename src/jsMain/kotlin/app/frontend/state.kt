@@ -29,7 +29,7 @@ object ChatStore : RootStore<Chat>(Chat(router.current["room"].orEmpty(), router
 
     override val validator: ComponentValidator<Chat, Unit> = ChatValidator
 
-    private suspend fun loadUsers(member: String): List<String> =
+    private suspend fun loadMembers(member: String): List<String> =
         Json.decodeFromString(ListSerializer(String.serializer()), membersService.get().getBody()) - member
 
     val join = handle { chat ->
@@ -41,13 +41,13 @@ object ChatStore : RootStore<Chat>(Chat(router.current["room"].orEmpty(), router
             }
             delay(200)
             syncBy(scrollDown)
-            Chat(chat.room, chat.member, loadUsers(chat.member), emptyList(), true)
+            Chat(chat.room, chat.member, loadMembers(chat.member), emptyList(), true)
         } else chat
     }
 
     private val receive = handle<ChatMessage> { chat, msg ->
         chat.copy(
-            members = if (msg.type == MessageType.JOINING || msg.type == MessageType.LEAVING) loadUsers(chat.member) else chat.members,
+            members = if (msg.type == MessageType.JOINING || msg.type == MessageType.LEAVING) loadMembers(chat.member) else chat.members,
             messages = chat.messages + msg
         )
     }
