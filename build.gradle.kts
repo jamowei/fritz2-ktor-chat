@@ -1,6 +1,6 @@
 plugins {
     application
-    id("dev.fritz2.fritz2-gradle") version "0.9.1"
+    id("dev.fritz2.fritz2-gradle") version "0.10"
     kotlin("multiplatform") version "1.4.30"
     kotlin("plugin.serialization") version "1.4.30"
 }
@@ -10,10 +10,7 @@ version = "1.0"
 
 repositories {
     mavenCentral()
-    maven("https://oss.jfrog.org/artifactory/jfrog-dependencies")
-    maven("https://dl.bintray.com/kotlin/kotlin-js-wrappers")
-    maven("https://dl.bintray.com/kotlin/kotlinx")
-    maven("https://dl.bintray.com/kotlin/ktor")
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
 }
 
 application {
@@ -47,6 +44,7 @@ kotlin {
     }.binaries.executable()
 
     sourceSets {
+        val fritz2Version = "0.10"
         val ktorVersion = "1.4.2"
         val logbackVersion = "1.2.3"
         val serializationVersion = "1.0.1"
@@ -60,7 +58,7 @@ kotlin {
 
         val commonMain by getting {
             dependencies {
-                implementation("dev.fritz2:components:0.9.1")
+                implementation("dev.fritz2:components:$fritz2Version")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:$dateTimeVersion")
             }
