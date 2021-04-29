@@ -7,7 +7,7 @@ import app.frontend.views.members
 import app.shared.L
 import dev.fritz2.components.*
 import dev.fritz2.dom.values
-import dev.fritz2.styling.params.styled
+import dev.fritz2.styling.span
 import dev.fritz2.styling.theme.render
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -24,18 +24,18 @@ fun main() {
         appFrame {
             brand {
                 icon({
-                    color { tertiary.baseContrast }
+                    color { tertiary.mainContrast }
                     size { "2rem" }
                     margins { right { normal } }
                 }) { fromTheme { fritz2 } }
-                (::span.styled {
+                span({
                     fontWeight { semiBold }
                     fontSize { large }
                 }) { +"Chat" }
             }
 
             header {
-                (::span.styled {
+                span({
                     fontWeight { semiBold }
                     fontSize { large }
                 }) {

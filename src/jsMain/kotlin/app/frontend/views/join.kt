@@ -6,7 +6,7 @@ import dev.fritz2.components.clickButton
 import dev.fritz2.components.formControl
 import dev.fritz2.components.stackUp
 import dev.fritz2.dom.html.RenderContext
-import dev.fritz2.styling.params.styled
+import dev.fritz2.styling.img
 
 fun RenderContext.joinPage(roomStore: Store<String>, memberStore: Store<String>) {
 
@@ -18,20 +18,20 @@ fun RenderContext.joinPage(roomStore: Store<String>, memberStore: Store<String>)
         spacing { large }
         items {
 
-            (::img.styled {
-                width(sm = { full }, lg = { "50%" } )
+            img({
+                width(sm = { full }, lg = { "50%" })
             }) {
                 src("img/undraw_Status_update_re_dm9y.svg")
             }
 
             formControl {
-                inputField(store = roomStore) {
+                inputField(value = roomStore) {
                     placeholder("Enter the title of your chat")
                 }
             }
 
             formControl {
-                inputField(store = memberStore) {
+                inputField(value = memberStore) {
                     placeholder("Enter your name")
                 }
             }

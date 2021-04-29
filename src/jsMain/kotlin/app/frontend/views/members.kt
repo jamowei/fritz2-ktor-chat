@@ -7,12 +7,12 @@ import dev.fritz2.components.lineUp
 import dev.fritz2.components.stackUp
 import dev.fritz2.dom.html.Div
 import dev.fritz2.dom.html.RenderContext
-import dev.fritz2.styling.params.styled
+import dev.fritz2.styling.img
 
 fun RenderContext.avatar(name: String) {
-    (::img.styled {
+    img({
         radius { "50%" }
-        background { color { primary.highlight } }
+        background { color { primary.main } }
         padding { "3px" }
     }) {
         src("http://www.avatarpro.biz/avatar/${name.hashCode()})?s=55")
@@ -29,13 +29,13 @@ fun RenderContext.member(name: String): Div =
             avatar(name)
             div {
                 box({
-                    color { gray50 }
+                    color { tertiary.mainContrast }
                     fontWeight { semiBold }
                     lineHeight { small }
                 }) { +name }
                 box({
                     fontSize { small }
-                    color { primary.highlight }
+                    color { primary.main }
                 }) {
                     icon({
                         size { small }

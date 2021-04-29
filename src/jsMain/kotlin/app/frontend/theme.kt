@@ -11,12 +11,12 @@ object ChatTheme : DefaultTheme() {
     override val appFrame: AppFrameStyles = object : AppFrameStyles by super.appFrame {
 
         override val brand: Style<FlexParams> = {
-            background { color { tertiary.base } }
+            background { color { tertiary.main } }
             paddings {
                 all { small }
                 left { normal }
             }
-            color { tertiary.baseContrast }
+            color { tertiary.mainContrast }
             alignItems { center }
             borders {
                 bottom {
@@ -27,15 +27,15 @@ object ChatTheme : DefaultTheme() {
         }
 
         override val sidebar: Style<BasicParams> = {
-            background { color { tertiary.base } }
-            color { tertiary.baseContrast }
+            background { color { tertiary.main } }
+            color { tertiary.mainContrast }
             minWidth { "25vw" }
         }
 
         override val main: Style<BasicParams> = {
             padding { none }
             background { color { gray50 } }
-            color { gray700 }
+            color { font }
         }
 
         override val tabs: Style<FlexParams> = {
@@ -57,7 +57,18 @@ object ChatTheme : DefaultTheme() {
                 height { full }
                 padding { none }
             }
+        }
 
+        override val navSection: Style<BasicParams> = {
+            paddings {
+                vertical { "0.5rem" }
+                horizontal { small }
+            }
+            margins { top { small } }
+            textTransform { uppercase }
+            fontWeight { semiBold }
+            fontSize { ".8rem" }
+            color { tertiary.mainContrast }
         }
     }
 }

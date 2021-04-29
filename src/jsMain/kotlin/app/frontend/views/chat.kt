@@ -8,7 +8,7 @@ import dev.fritz2.components.icon
 import dev.fritz2.components.lineUp
 import dev.fritz2.components.stackUp
 import dev.fritz2.dom.html.RenderContext
-import dev.fritz2.styling.params.styled
+import dev.fritz2.styling.span
 
 
 fun RenderContext.sentFrom(member: String) {
@@ -16,7 +16,7 @@ fun RenderContext.sentFrom(member: String) {
         size { normal }
         margins { top { tiny } }
     }) { fromTheme { user } }
-    (::span.styled {
+    span({
         fontWeight { semiBold }
     }) {
         +member
@@ -24,7 +24,7 @@ fun RenderContext.sentFrom(member: String) {
 }
 
 fun RenderContext.sentAt(time: String) {
-    (::span.styled {
+    span({
         color { gray500 }
     }) {
         icon({
@@ -51,7 +51,7 @@ fun RenderContext.chatMessage(msg: ChatMessage, self: Boolean) {
     }
     box({
         boxShadow { flat }
-        background { color { if (self) primary.base else secondary.base } }
+        background { color { if (self) primary.main else secondary.main } }
         color { "white" }
         padding { small }
         radius { normal }
