@@ -1,8 +1,8 @@
 plugins {
     application
-    id("dev.fritz2.fritz2-gradle") version "0.10"
-    kotlin("multiplatform") version "1.4.30"
-    kotlin("plugin.serialization") version "1.4.30"
+    id("dev.fritz2.fritz2-gradle") version "0.11"
+    kotlin("multiplatform") version "1.5.10"
+    kotlin("plugin.serialization") version "1.5.10"
 }
 
 group = "dev.fritz2"
@@ -10,7 +10,6 @@ version = "1.0"
 
 repositories {
     mavenCentral()
-    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
 }
 
 application {
@@ -31,7 +30,7 @@ kotlin {
             runTask {
                 devServer = devServer?.copy(
                     port = 9000,
-                    proxy = mapOf(
+                    proxy = mutableMapOf(
                         "/members" to "http://localhost:8080",
                         "/chat" to mapOf(
                             "target" to "ws://localhost:8080",
@@ -44,11 +43,11 @@ kotlin {
     }.binaries.executable()
 
     sourceSets {
-        val fritz2Version = "0.10"
-        val ktorVersion = "1.4.2"
+        val fritz2Version = "0.11"
+        val ktorVersion = "1.6.0"
         val logbackVersion = "1.2.3"
-        val serializationVersion = "1.0.1"
-        val dateTimeVersion = "0.1.1"
+        val serializationVersion = "1.2.1"
+        val dateTimeVersion = "0.2.1"
 
         all {
             languageSettings.apply {
