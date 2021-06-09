@@ -62,7 +62,7 @@ fun main() {
                 ChatStore.joined.render {
                     if (it) {
                         clickButton {
-                            icon { fromTheme { share } }
+                            icon { share }
                             variant { link }
                         } handledBy ChatStore.invite
                     }
@@ -106,7 +106,7 @@ fun main() {
                                     }
                                 }
                                 clickButton {
-                                    icon { fromTheme { play } }
+                                    icon { play }
                                     variant { link }
                                 }.map {
                                     inputFieldDomNode.focus()

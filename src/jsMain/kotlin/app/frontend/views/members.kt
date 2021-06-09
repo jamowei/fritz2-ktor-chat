@@ -10,12 +10,16 @@ import dev.fritz2.dom.html.RenderContext
 import dev.fritz2.styling.img
 
 fun RenderContext.avatar(name: String) {
+    val num = name.hashCode().toString().substring(0..1).let {
+        if (it.toInt() > 70) "70" else it
+    }
+
     img({
         radius { "50%" }
         background { color { primary.main } }
         padding { "3px" }
     }) {
-        src("http://www.avatarpro.biz/avatar/${name.hashCode()})?s=55")
+        src("https://i.pravatar.cc/40?img=$num")
         alt("avatar")
     }
 }
