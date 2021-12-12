@@ -32,13 +32,13 @@ object ChatTheme : DefaultTheme() {
             minWidth { "25vw" }
         }
 
-        override val main: Style<BasicParams> = {
+        override val content: Style<BasicParams> = {
             padding { none }
             background { color { gray50 } }
             color { font }
         }
 
-        override val tabs: Style<FlexParams> = {
+        override val tablist: Style<FlexParams> = {
             borders {
                 top {
                     width { "1px " }
@@ -57,18 +57,6 @@ object ChatTheme : DefaultTheme() {
                 height { full }
                 padding { none }
             }
-        }
-
-        override val navSection: Style<BasicParams> = {
-            paddings {
-                vertical { "0.5rem" }
-                horizontal { small }
-            }
-            margins { top { small } }
-            textTransform { uppercase }
-            fontWeight { semiBold }
-            fontSize { ".8rem" }
-            color { tertiary.mainContrast }
         }
     }
 }

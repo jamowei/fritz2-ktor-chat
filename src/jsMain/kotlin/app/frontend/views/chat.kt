@@ -3,11 +3,11 @@ package app.frontend.views
 import app.frontend.ChatStore
 import app.shared.ChatMessage
 import app.shared.L
-import dev.fritz2.components.box
 import dev.fritz2.components.icon
 import dev.fritz2.components.lineUp
 import dev.fritz2.components.stackUp
 import dev.fritz2.dom.html.RenderContext
+import dev.fritz2.styling.div
 import dev.fritz2.styling.span
 
 
@@ -49,7 +49,7 @@ fun RenderContext.chatMessage(msg: ChatMessage, self: Boolean) {
             sentAt(msg.created)
         }
     }
-    box({
+    div({
         boxShadow { flat }
         background { color { if (self) primary.main else secondary.main } }
         color { "white" }
@@ -61,25 +61,30 @@ fun RenderContext.chatMessage(msg: ChatMessage, self: Boolean) {
 }
 
 fun RenderContext.chatPage() {
-    stackUp({
-        alignItems { stretch }
-        height { full }
+    div({
+        minHeight { full }
+        width { full }
         background {
             image { "/img/y-so-serious-white.png" }
             repeat { repeat }
         }
         padding { normal }
     }) {
-        items {
-            ChatStore.sub(L.Chat.messages).data.renderEach { msg ->
-                val self = msg.member == ChatStore.current.member
+        stackUp({
+            alignItems { stretch }
+        }) {
+            items {
+                ChatStore.sub(L.Chat.messages).data.renderEach { msg ->
+                    val self = msg.member == ChatStore.current.member
 
-                box({
-                    flex { alignSelf { if (self) flexEnd else flexStart } }
-                }) {
-                    chatMessage(msg, self)
+                    div({
+                        flex { alignSelf { if (self) flexEnd else flexStart } }
+                    }) {
+                        chatMessage(msg, self)
+                    }
                 }
             }
         }
     }
+
 }

@@ -23,7 +23,8 @@ import kotlinx.serialization.json.Json
 
 val router = router(emptyMap())
 
-object ChatStore : RootStore<Chat>(Chat(router.current["room"].orEmpty(), router.current["member"].orEmpty())), WithValidator<Chat, Unit> {
+object ChatStore : RootStore<Chat>(Chat(router.current["room"].orEmpty(), router.current["member"].orEmpty())),
+    WithValidator<Chat, Unit> {
     private lateinit var membersService: Request
     private lateinit var session: Session
 
@@ -40,7 +41,6 @@ object ChatStore : RootStore<Chat>(Chat(router.current["room"].orEmpty(), router
                 it.send(ChatMessage("", chat.member, MessageType.JOINING).toJson())
             }
             delay(200)
-            syncBy(scrollDown)
             Chat(chat.room, chat.member, loadMembers(chat.member), emptyList(), true)
         } else chat
     }
@@ -55,15 +55,15 @@ object ChatStore : RootStore<Chat>(Chat(router.current["room"].orEmpty(), router
     val send = handle<String> { chat, msg ->
         if (msg.isNotBlank()) {
             chat.copy(messages = chat.messages + ChatMessage(msg, chat.member).also { session.send(it.toJson()) })
-        }
-        else chat
+        } else chat
     }
 
-    private val scrollDown = handle { msgs ->
-        document.getElementById("chat-messages")?.let {
-            it.scrollTo(0.0, it.scrollHeight.toDouble())
+    private val scrollDown = handle {
+        delay(100)
+        document.getElementById("main")?.let { elem ->
+            elem.scrollTo(0.0, elem.scrollHeight.toDouble())
         }
-        msgs
+        it
     }
 
     val invite = handle {
@@ -84,6 +84,7 @@ object ChatStore : RootStore<Chat>(Chat(router.current["room"].orEmpty(), router
 
     init {
         if (current.readyToJoin) join()
+        syncBy(scrollDown)
     }
 }
 

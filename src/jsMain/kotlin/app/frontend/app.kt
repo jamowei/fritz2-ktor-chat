@@ -11,7 +11,6 @@ import dev.fritz2.styling.span
 import dev.fritz2.styling.theme.render
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import navSection
 import org.w3c.dom.HTMLInputElement
 
 fun main() {
@@ -46,13 +45,13 @@ fun main() {
                 }
             }
 
-            nav {
+
+            navigation {
                 ChatStore.data.map { it.members.isNotEmpty() }.distinctUntilChanged().render {
                     if (it) {
                         navSection("Members")
                         members(ChatStore.sub(L.Chat.members))
-                    }
-                    else {
+                    } else {
                         fritzLinks()
                     }
                 }
@@ -64,13 +63,14 @@ fun main() {
                         clickButton {
                             icon { share }
                             variant { link }
+                            type { primary.inverted() }
                         } handledBy ChatStore.invite
                     }
                 }
             }
 
-            footer {
-                ChatStore.joined.renderElement(preserveOrder = false) {
+            complementary {
+                ChatStore.joined.render {
                     div {
                         if (it) {
                             memberStore.data.render { member ->
@@ -81,13 +81,13 @@ fun main() {
                 }
             }
 
-            main {
-                ChatStore.joined.render {
+            content(id = "main") {
+                ChatStore.joined.render(into = this) {
                     if (it) chatPage() else joinPage(roomStore, memberStore)
                 }
             }
 
-            tabs {
+            tablist {
                 ChatStore.joined.render {
                     if (it) {
                         lineUp({

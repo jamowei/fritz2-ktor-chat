@@ -3,9 +3,11 @@ package app.shared
 import dev.fritz2.components.validation.ComponentValidationMessage
 import dev.fritz2.components.validation.ComponentValidator
 import dev.fritz2.components.validation.errorMessage
-import dev.fritz2.identification.inspect
+import dev.fritz2.identification.Inspector
 import dev.fritz2.lenses.Lenses
 import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
@@ -44,18 +46,18 @@ data class Chat(
 
 // returning current time in "HH:mm" format
 fun currentAsString(): String =
-    Clock.System.now().toString().substringAfter('T').dropLast(8)
+    Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        .toString().substringAfter('T').dropLast(7)
 
 object ChatValidator : ComponentValidator<Chat, Unit>() {
-    @ExperimentalStdlibApi
-    override fun validate(data: Chat, metadata: Unit): List<ComponentValidationMessage> {
-        val member = inspect(data).sub(L.Chat.member)
-        val room = inspect(data).sub(L.Chat.room)
+    override fun validate(inspector: Inspector<Chat>, metadata: Unit): List<ComponentValidationMessage> {
+        val member = inspector.sub(L.Chat.member)
+        val room = inspector.sub(L.Chat.room)
 
         return buildList {
-            if (member.data.isBlank()) add(errorMessage(member.id, "Sorry, you have to enter a name"))
-            else if (member.data.trim().length > 25) add(errorMessage(member.id, "Please use a shorter name."))
-            if (room.data.isBlank()) add(errorMessage(room.id, "You have to enter the title of your chat"))
+            if (member.data.isBlank()) add(errorMessage(member.path, "Sorry, you have to enter a name"))
+            else if (member.data.trim().length > 25) add(errorMessage(member.path, "Please use a shorter name."))
+            if (room.data.isBlank()) add(errorMessage(room.path, "You have to enter the title of your chat"))
         }
     }
 }
