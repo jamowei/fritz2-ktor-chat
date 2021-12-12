@@ -1,8 +1,8 @@
 plugins {
     application
-    id("dev.fritz2.fritz2-gradle") version "0.11"
-    kotlin("multiplatform") version "1.5.10"
-    kotlin("plugin.serialization") version "1.5.10"
+    id("dev.fritz2.fritz2-gradle") version "0.13"
+    kotlin("multiplatform") version "1.5.32"
+    kotlin("plugin.serialization") version "1.5.32"
 }
 
 group = "dev.fritz2"
@@ -13,7 +13,7 @@ repositories {
 }
 
 application {
-    mainClassName = "app.backend.ServerKt"
+    mainClass.set("app.backend.ServerKt")
 }
 
 kotlin {
@@ -43,15 +43,16 @@ kotlin {
     }.binaries.executable()
 
     sourceSets {
-        val fritz2Version = "0.11"
-        val ktorVersion = "1.6.0"
+        val fritz2Version = "0.13"
+        val ktorVersion = "1.6.7"
         val logbackVersion = "1.2.3"
-        val serializationVersion = "1.2.1"
-        val dateTimeVersion = "0.2.1"
+        val serializationVersion = "1.3.1"
+        val dateTimeVersion = "0.3.1"
 
         all {
             languageSettings.apply {
-                useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
+                optIn("kotlin.ExperimentalStdlibApi")
+                optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
             }
         }
 
